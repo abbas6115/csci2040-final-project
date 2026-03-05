@@ -1,3 +1,5 @@
+package csci2040u.bytecouncil;
+
 public class account {
     // Attributes
     String username;

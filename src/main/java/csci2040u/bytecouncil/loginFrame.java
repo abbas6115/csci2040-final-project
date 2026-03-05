@@ -1,3 +1,5 @@
+package csci2040u.bytecouncil;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
