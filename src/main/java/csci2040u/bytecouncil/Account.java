@@ -1,13 +1,13 @@
 package csci2040u.bytecouncil;
 
-public class account {
+public class Account {
     // Attributes
     String username;
     String password;
     String userID;
 
     // Constructor
-    public account(String username, String password, String userID) {
+    public Account(String username, String password, String userID) {
         this.username = username;
         this.password = password;
         this.userID = userID;

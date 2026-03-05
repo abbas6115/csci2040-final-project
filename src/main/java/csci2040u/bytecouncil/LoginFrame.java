@@ -5,9 +5,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class loginFrame extends JFrame {
+public class LoginFrame extends JFrame {
     
-    public loginFrame() {
+    public LoginFrame() {
         // Set window title
         setTitle("Login");
         
@@ -84,7 +84,7 @@ public class loginFrame extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new loginFrame();
+                new LoginFrame();
             }
         });
     }
