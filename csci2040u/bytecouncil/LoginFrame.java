@@ -1,7 +1,5 @@
 package csci2040u.bytecouncil;
 
-import csci2040u.bytecouncil.catalogscreen.MovieCatalogGUI;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -70,20 +68,7 @@ public class LoginFrame extends JFrame {
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String password = new String(passwordField.getPassword());
-
-                if ("user1".equals(username) && "password".equals(password)) {
-                    dispose();
-                    MovieCatalogGUI movieCatalog = new MovieCatalogGUI();
-                } else {
-                    JOptionPane.showMessageDialog(
-                            LoginFrame.this,
-                            "Invalid username or password",
-                            "Login Failed",
-                            JOptionPane.ERROR_MESSAGE
-                    );
-                }
+                // Button does nothing when pressed
             }
         });
         
