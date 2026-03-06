@@ -1,5 +1,7 @@
 package csci2040u.bytecouncil;
 
+import csci2040u.bytecouncil.catalogscreen.MovieCatalogGUI;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -69,6 +71,8 @@ public class LoginFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Button does nothing when pressed
+                dispose();
+                MovieCatalogGUI catalougGUI=new MovieCatalogGUI();
             }
         });
         
