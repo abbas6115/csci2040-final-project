@@ -13,7 +13,7 @@ public class MovieArea extends JPanel {
     }
 
     private void testArea(int numButtons) {
-        for(int i = 0; i < numButtons; i++) {
+        for (int i = 0; i < numButtons; i++) {
             this.add(new JButton("Movie " + i));
         }
     }

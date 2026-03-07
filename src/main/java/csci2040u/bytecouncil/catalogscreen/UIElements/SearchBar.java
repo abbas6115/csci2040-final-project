@@ -9,7 +9,7 @@ public class SearchBar extends JPanel {
     private JTextField searchField;
     private JButton searchButton;
 
-    public SearchBar(){
+    public SearchBar() {
         // panel settings
         this.setLayout(new FlowLayout());
         this.setPreferredSize(new Dimension(Integer.MAX_VALUE,50));
@@ -25,8 +25,8 @@ public class SearchBar extends JPanel {
         searchField.addFocusListener(tempTextLogic);
         searchField.addKeyListener(tempTextLogic);
         // search button
-        searchButton=new JButton("Search");
-        searchButton.addActionListener(e -> {searchItem();});
+        searchButton = new JButton("Search");
+        searchButton.addActionListener(e -> {searchItem(); });
 
         // adding components to searchbar
         this.add(searchField);
@@ -38,7 +38,7 @@ public class SearchBar extends JPanel {
         @Override
         public void focusGained(FocusEvent e) {
             // replace
-            if(searchField.getText().equals(defaultText)) {
+            if (searchField.getText().equals(defaultText)) {
                 searchField.setText("");
             }
 
@@ -47,7 +47,7 @@ public class SearchBar extends JPanel {
         // while focus is lost and field is empty, display default text
         @Override
         public void focusLost(FocusEvent e) {
-            if(searchField.getText().isEmpty()) {
+            if (searchField.getText().isEmpty()) {
                 searchField.setText(defaultText);
             }
         }
@@ -55,7 +55,7 @@ public class SearchBar extends JPanel {
         // run searchItem on enter
         @Override
         public void keyPressed(KeyEvent e) {
-            if(e.getKeyChar() == KeyEvent.VK_ENTER) {
+            if (e.getKeyChar() == KeyEvent.VK_ENTER) {
                 searchItem();
             }
         }
