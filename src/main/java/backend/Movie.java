@@ -1,11 +1,15 @@
-package csci2040u.bytecouncil.movieclass;
+package backend;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode
 public class Movie {
     String name;
     String posterURL;
     String actors;
     String genre;
     String ratings;
+    int year;
 
 
     public Movie(){
@@ -31,6 +35,7 @@ public class Movie {
     public String getActors() { return actors; }
     public String getGenre() { return genre; }
     public String getRatings() { return ratings; }
+    public int getYear(){return year;}
 
     //setters
     public void setName(String name) { this.name = name; }
@@ -38,4 +43,6 @@ public class Movie {
     public void setActors(String actors) { this.actors = actors; }
     public void setGenre(String genre) { this.genre = genre; }
     public void setRatings(String ratings) { this.ratings = ratings; }
+    public void setYear(int year){this.year=year;}
+
 }
