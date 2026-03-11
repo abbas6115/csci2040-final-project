@@ -79,6 +79,9 @@ public class MovieCsvWriter {
                 movie.setRatings(defaultIfMissing(getValue(values, 5)));
                 movie.setReleaseYear(parseReleaseYear(getValue(values, 6)));
 
+                //allows for the repository to set its own id and
+
+                movie.setId(null);
                 movies.add(movie);
             }
 
