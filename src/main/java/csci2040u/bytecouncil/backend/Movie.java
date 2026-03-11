@@ -1,4 +1,4 @@
-package backend;
+package csci2040u.bytecouncil.backend;
 
 import lombok.EqualsAndHashCode;
 
@@ -20,12 +20,13 @@ public class Movie {
         ratings="0.0";
     }
 
-    public Movie(String name, String posterURL, String actors, String genre, String ratings) {
+    public Movie(String name, String posterURL, String actors, String genre, String ratings,int year) {
         this.name = name;
         this.posterURL = posterURL;
         this.actors = actors;
         this.genre = genre;
         this.ratings = ratings;
+        this.year=year;
     }
 
 
