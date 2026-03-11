@@ -1,11 +1,12 @@
 package csci2040u.bytecouncil.backend;
 
-import lombok.RequiredArgsConstructor;
+import java.util.Collection;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.vaadin.crudui.crud.CrudListener;
 
-import java.util.Collection;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 //This command creates the movie repository attribute with the required arguments
@@ -13,18 +14,27 @@ import java.util.List;
 public class MovieDatabaseCommands implements CrudListener<Movie> {
     //if this is red underlined, go to settings and turn on annotated processing in File->settings->build,Execute->compiler, and download the Lombok plugin in settings->plugins
     private final MovieRepository movieRepo;
+    private final MovieCsvWriter movieCsvWriter;
 
 
 
 
     @Override
     public Collection<Movie> findAll() {
-        return movieRepo.findAll();
+        Collection<Movie> databaseMovies = movieRepo.findAll();
+        if (!databaseMovies.isEmpty()) {
+            return databaseMovies;
+        }
+
+        return movieCsvWriter.readMovies();
     }
 
     @Override
+    @Transactional
     public Movie add(Movie movie) {
-        return movieRepo.save(movie);
+        Movie savedMovie = movieRepo.save(movie);
+        movieCsvWriter.appendMovie(savedMovie);
+        return savedMovie;
     }
 
     @Override
