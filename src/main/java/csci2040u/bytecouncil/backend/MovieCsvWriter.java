@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
+// Handles CSV persistence and retrieval for movie data used by catalog/admin views
 public class MovieCsvWriter {
     private static final String HEADER = "id,name,posterURL,actors,genre,ratings,releaseYear";
 
@@ -29,6 +30,7 @@ public class MovieCsvWriter {
                 Files.createDirectories(parent);
             }
 
+            // Ensure the CSV starts with a header when the file is first created
             if (Files.notExists(csvPath)) {
                 Files.writeString(
                         csvPath,
@@ -52,6 +54,7 @@ public class MovieCsvWriter {
     }
 
     public List<Movie> readMovies() {
+        // If no CSV exists yet, return an empty list so the UI can render safely
         if (Files.notExists(csvPath)) {
             return Collections.emptyList();
         }
@@ -61,6 +64,7 @@ public class MovieCsvWriter {
             List<Movie> movies = new ArrayList<>();
 
             for (String line : lines) {
+                // Skip blank lines and the header row.
                 if (line == null || line.isBlank() || line.startsWith("id,")) {
                     continue;
                 }
@@ -112,6 +116,7 @@ public class MovieCsvWriter {
             char character = line.charAt(index);
 
             if (character == '"') {
+                // Support escaped quotes represented as doubled double-quotes
                 if (inQuotes && index + 1 < line.length() && line.charAt(index + 1) == '"') {
                     currentValue.append('"');
                     index++;
@@ -163,6 +168,7 @@ public class MovieCsvWriter {
     }
 
     private String defaultIfMissing(String value) {
+        // Missing CSV fields are surfaced as N/A in UI cards
         return value == null || value.isBlank() ? "N/A" : value;
     }
 }

@@ -22,16 +22,19 @@ public class MovieDatabaseCommands implements CrudListener<Movie> {
     @Override
     public Collection<Movie> findAll() {
         Collection<Movie> databaseMovies = movieRepo.findAll();
+        // Prefer DB values during the same runtime session when they exist.
         if (!databaseMovies.isEmpty()) {
             return databaseMovies;
         }
 
+        // Fall back to CSV so admin/catalog can still show persisted movies after restarts
         return movieCsvWriter.readMovies();
     }
 
     @Override
     @Transactional
     public Movie add(Movie movie) {
+        // Keep DB as source of truth and mirror the saved record to CSV storage
         Movie savedMovie = movieRepo.save(movie);
         movieCsvWriter.appendMovie(savedMovie);
         return savedMovie;

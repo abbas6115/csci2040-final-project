@@ -19,11 +19,13 @@ public class MovieCatalogView extends VerticalLayout {
         add(new H1("Movie Catalog View"));
 
         Div catalogGrid = new Div();
+        // Render a compact 3-column card grid on the main page
         catalogGrid.getStyle().set("display", "grid");
         catalogGrid.getStyle().set("grid-template-columns", "repeat(3, minmax(0, 1fr))");
         catalogGrid.getStyle().set("gap", "10px");
         catalogGrid.getStyle().set("width", "100%");
 
+        // Build cards from CSV-backed movie objects
         for (Movie movie : movieCsvWriter.readMovies()) {
             catalogGrid.add(createMovieCard(movie));
         }
