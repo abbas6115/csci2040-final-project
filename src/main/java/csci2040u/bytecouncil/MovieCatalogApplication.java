@@ -2,6 +2,10 @@ package csci2040u.bytecouncil;
 //This class is the start of the project. Running this class starts the webpage at localhost:8080 and then allows for the website
 //to be seen on local host
 
+/* localhost:8080 will get you to the default movie catalog view
+localhost:8080/login will get you to default login screen. Temp account Admin1 with password. This will take you to login
+*/
+
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import csci2040u.bytecouncil.ui.LoginView;
 import org.springframework.boot.SpringApplication;
