@@ -1,11 +1,15 @@
 package csci2040u.bytecouncil.ui;
 
 
+import java.util.Locale;
+
 import org.vaadin.crudui.crud.CrudOperation;
 import org.vaadin.crudui.crud.impl.GridCrud;
 
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 
 import csci2040u.bytecouncil.backend.Movie;
@@ -32,10 +36,40 @@ public class AdminView extends VerticalLayout {
                 crud.setUpdateOperation(commands::update);
                 crud.setDeleteOperation(commands::delete);
 
+        // Create a search field to filter movies by name in the grid
+        TextField searchField = new TextField("Search movies");
+        searchField.setPlaceholder("Search by movie name");
+        searchField.setClearButtonVisible(true);
+        searchField.setWidthFull();
+        searchField.setValueChangeMode(ValueChangeMode.EAGER);
+        searchField.addValueChangeListener(event -> {
+            String searchTerm = event.getValue() == null ? "" : event.getValue();
+            crud.getGrid().setItems(
+                    commands.findAll().stream()
+                            .filter(movie -> matchesSearch(movie, searchTerm))
+                            .toList()
+            );
+        });
+
 
         add(
           new H1("Admin View"),
+                searchField,
                 crud
         );
+    }
+
+    // Helper method to check if a movie matches the search term
+    private boolean matchesSearch(Movie movie, String searchTerm) {
+        String normalizedSearch = searchTerm.trim().toLowerCase(Locale.ROOT);
+        if (normalizedSearch.isEmpty()) {
+            return true;
+        }
+
+        return contains(movie.getName(), normalizedSearch);
+    }
+
+    private boolean contains(String value, String searchTerm) {
+        return value != null && value.toLowerCase(Locale.ROOT).contains(searchTerm);
     }
 }

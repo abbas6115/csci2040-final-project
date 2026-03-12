@@ -117,6 +117,7 @@ public class MovieCsvWriter {
         }
     }
 
+    // Helper method to convert a Movie object to a CSV row string with proper escaping
     private String toCsvRow(Movie movie) {
         return String.join(
                 ",",
@@ -130,12 +131,14 @@ public class MovieCsvWriter {
         );
     }
 
+    // Helper method to escape special characters in CSV values (e.g., commas, quotes)
     private String escape(String value) {
         String sanitizedValue = value == null ? "" : value;
         String escapedValue = sanitizedValue.replace("\"", "\"\"");
         return '"' + escapedValue + '"';
     }
 
+    // Helper method to parse a CSV line into individual values, handling quoted fields with commas
     private List<String> parseCsvLine(String line) {
         List<String> values = new ArrayList<>();
         StringBuilder currentValue = new StringBuilder();

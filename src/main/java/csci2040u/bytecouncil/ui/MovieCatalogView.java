@@ -1,11 +1,17 @@
 package csci2040u.bytecouncil.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -22,6 +28,13 @@ public class MovieCatalogView extends VerticalLayout {
     public MovieCatalogView(MovieCsvWriter movieCsvWriter){
         add(new H1("Movie Catalog View"));
 
+        // Create a search field to filter movies by name in the grid
+        TextField searchField = new TextField("Search movies");
+        searchField.setPlaceholder("Search by movie name");
+        searchField.setClearButtonVisible(true);
+        searchField.setWidthFull();
+        searchField.setValueChangeMode(ValueChangeMode.EAGER);
+
         Div catalogGrid = new Div();
         // Render a compact 3-column card grid on the main page
         catalogGrid.getStyle().set("display", "grid");
@@ -29,14 +42,41 @@ public class MovieCatalogView extends VerticalLayout {
         catalogGrid.getStyle().set("gap", "10px");
         catalogGrid.getStyle().set("width", "100%");
 
-        // Build cards from CSV-backed movie objects
-        for (Movie movie : movieCsvWriter.readMovies()) {
-            catalogGrid.add(createMovieCard(movie));
-        }
+        List<Movie> allMovies = new ArrayList<>(movieCsvWriter.readMovies());
+        refreshCatalog(catalogGrid, allMovies, "");
 
-        add(catalogGrid);
+        searchField.addValueChangeListener(event ->
+                refreshCatalog(catalogGrid, allMovies, event.getValue())
+        );
+
+        add(searchField, catalogGrid);
     }
 
+    // Helper method to refresh the catalog grid based on the current search term
+    private void refreshCatalog(Div catalogGrid, List<Movie> allMovies, String searchTerm) {
+        catalogGrid.removeAll();
+        for (Movie movie : allMovies) {
+            if (matchesSearch(movie, searchTerm)) {
+                catalogGrid.add(createMovieCard(movie));
+            }
+        }
+    }
+
+    // Helper method to check if a movie matches the search term
+    private boolean matchesSearch(Movie movie, String searchTerm) {
+        String normalizedSearch = searchTerm == null ? "" : searchTerm.trim().toLowerCase(Locale.ROOT);
+        if (normalizedSearch.isEmpty()) {
+            return true;
+        }
+
+        return contains(movie.getName(), normalizedSearch);
+    }
+
+    private boolean contains(String value, String searchTerm) {
+        return value != null && value.toLowerCase(Locale.ROOT).contains(searchTerm);
+    }
+
+    // Helper method to create a card layout for each movie
     private HorizontalLayout createMovieCard(Movie movie) {
         VerticalLayout movieDetails = new VerticalLayout(
                 new Paragraph("Name: " + valueOrNA(movie.getName())),
