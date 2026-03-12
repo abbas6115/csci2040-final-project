@@ -7,6 +7,7 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import csci2040u.bytecouncil.backend.Movie;
@@ -15,6 +16,7 @@ import csci2040u.bytecouncil.backend.MovieCsvWriter;
 //Anonymous allowed tells springboot you don't need to login to access this page
 //route("") tells its default page, we can change this later
 @Route("")
+@RouteAlias("user")
 @AnonymousAllowed
 public class MovieCatalogView extends VerticalLayout {
     public MovieCatalogView(MovieCsvWriter movieCsvWriter){

@@ -53,6 +53,32 @@ public class MovieCsvWriter {
         }
     }
 
+    public void overwriteMovies(Iterable<Movie> movies) {
+        try {
+            Path parent = csvPath.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+
+            StringBuilder content = new StringBuilder();
+            content.append(HEADER).append(System.lineSeparator());
+            for (Movie movie : movies) {
+                content.append(toCsvRow(movie)).append(System.lineSeparator());
+            }
+
+            Files.writeString(
+                    csvPath,
+                    content.toString(),
+                    StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING,
+                    StandardOpenOption.WRITE
+            );
+        } catch (IOException exception) {
+            throw new IllegalStateException("Failed to overwrite movies in CSV file", exception);
+        }
+    }
+
     public List<Movie> readMovies() {
         // If no CSV exists yet, return an empty list so the UI can render safely
         if (Files.notExists(csvPath)) {

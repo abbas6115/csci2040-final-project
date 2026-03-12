@@ -23,11 +23,17 @@ public class MovieDatabaseCommands implements CrudListener<Movie> {
     public Collection<Movie> findAll() {
         Collection<Movie> databaseMovies = movieRepo.findAll();
         // Prefer DB values during the same runtime session when they exist.
-        if (databaseMovies.isEmpty()) {
-            movieRepo.saveAll(movieCsvWriter.readMovies());
+        if (!databaseMovies.isEmpty()) {
+            return databaseMovies;
         }
 
         // Fall back to CSV so admin/catalog can still show persisted movies after restarts
+        Collection<Movie> csvMovies = movieCsvWriter.readMovies();
+        if (!csvMovies.isEmpty()) {
+            movieRepo.saveAll(csvMovies);
+            return movieRepo.findAll();
+        }
+
         return databaseMovies;
     }
 
@@ -42,11 +48,19 @@ public class MovieDatabaseCommands implements CrudListener<Movie> {
 
     @Override
     public Movie update(Movie movie) {
-        return movieRepo.save(movie);
+        Movie updatedMovie = movieRepo.save(movie);
+        movieCsvWriter.overwriteMovies(movieRepo.findAll());
+        return updatedMovie;
     }
 
     @Override
+    @Transactional
     public void delete(Movie movie) {
-        movieRepo.delete(movie);
+        if (movie.getId() != null) {
+            movieRepo.deleteById(movie.getId());
+        } else {
+            movieRepo.delete(movie);
+        }
+        movieCsvWriter.overwriteMovies(movieRepo.findAll());
     }
 }

@@ -6,8 +6,6 @@ package csci2040u.bytecouncil;
 localhost:8080/login will get you to default login screen. Temp account Admin1 with password. This will take you to login
 */
 
-import com.vaadin.flow.spring.security.VaadinWebSecurity;
-import csci2040u.bytecouncil.ui.LoginView;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +14,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+
+import com.vaadin.flow.spring.security.VaadinWebSecurity;
+
+import csci2040u.bytecouncil.ui.LoginView;
 
 //@springBootApplication tells that this a webServer
 @SpringBootApplication
@@ -29,9 +31,17 @@ public class MovieCatalogApplication extends VaadinWebSecurity {
     //tells the program to use the loginView Class for security
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        //tells to use
-        setLoginView(http,LoginView.class,"/admin");
         super.configure(http);
+        setLoginView(http, LoginView.class, "/user");
+
+        // Send users to role-specific pages after a successful login.
+        http.formLogin(form -> form.successHandler((request, response, authentication) -> {
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+
+            String targetPath = isAdmin ? "/admin" : "/user";
+            response.sendRedirect(request.getContextPath() + targetPath);
+        }));
     }
 
     //create temporary user variables
