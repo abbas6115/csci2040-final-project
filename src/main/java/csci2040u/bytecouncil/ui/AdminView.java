@@ -3,6 +3,9 @@ package csci2040u.bytecouncil.ui;
 
 import java.util.Locale;
 
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import org.vaadin.crudui.crud.CrudOperation;
 import org.vaadin.crudui.crud.impl.GridCrud;
 
@@ -51,9 +54,16 @@ public class AdminView extends VerticalLayout {
             );
         });
 
+        // Make header
+        HorizontalLayout headerLayout = new HorizontalLayout();
+        headerLayout.setWidth("100%"); // Make the header take full width
+        Button catalogButton = new Button("MovieCatalogView", event -> {UI.getCurrent().navigate(MovieCatalogView.class);});
+        H1 title = new H1("Admin view");
+        headerLayout.add(title, catalogButton);
 
+        //add components to page
         add(
-          new H1("Admin View"),
+                headerLayout,
                 searchField,
                 crud
         );

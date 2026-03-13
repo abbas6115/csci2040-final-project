@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
@@ -16,6 +18,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
+import com.vaadin.flow.spring.security.AuthenticationContext;
 import csci2040u.bytecouncil.backend.Movie;
 import csci2040u.bytecouncil.backend.MovieCsvWriter;
 
@@ -25,8 +28,19 @@ import csci2040u.bytecouncil.backend.MovieCsvWriter;
 @RouteAlias("user")
 @AnonymousAllowed
 public class MovieCatalogView extends VerticalLayout {
-    public MovieCatalogView(MovieCsvWriter movieCsvWriter){
-        add(new H1("Movie Catalog View"));
+    public MovieCatalogView(MovieCsvWriter movieCsvWriter, AuthenticationContext authCont){
+
+        HorizontalLayout headerLayout = new HorizontalLayout();
+        headerLayout.setWidth("100%"); // Make the header take full width
+        Button adminButton = new Button("Admin View", event -> {UI.getCurrent().navigate(AdminView.class);});
+        adminButton.setVisible(authCont.hasRole("ADMIN"));
+        H1 title = new H1("Movie Catalog View");
+
+
+        headerLayout.add(title, adminButton);
+
+
+        add(headerLayout);
 
         // Create a search field to filter movies by name in the grid
         TextField searchField = new TextField("Search movies");

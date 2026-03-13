@@ -21,5 +21,7 @@ public class LoginView extends Composite<LoginOverlay> {
         //tells the original login Container to turn its self off and to use this one
         getContent().setOpened(true);
         getContent().setAction("login");
+        getContent().setTitle("Movie Catalog");
+        getContent().setDescription("");
     }
 }
