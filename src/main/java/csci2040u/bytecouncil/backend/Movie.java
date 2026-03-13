@@ -24,13 +24,13 @@ public class  Movie {
 
 
 
-    public Movie(){
+    public Movie() {
         name = "NA";
         posterURL = "NA";
         actors = "NA";
         genre = "NA";
-        ratings="0.0";
-        releaseYear=0;
+        ratings = "0.0";
+        releaseYear = 0;
     }
 
     public Movie(String name, String posterURL, String actors, String genre, String ratings,int year) {
@@ -39,7 +39,7 @@ public class  Movie {
         this.actors = actors;
         this.genre = genre;
         this.ratings = ratings;
-        this.releaseYear=year;
+        this.releaseYear = year;
     }
 
 
@@ -49,7 +49,7 @@ public class  Movie {
     public String getActors() { return actors; }
     public String getGenre() { return genre; }
     public String getRatings() { return ratings; }
-    public int getReleaseYear(){return releaseYear;}
+    public int getReleaseYear() {return releaseYear; }
     public Long getId() { return id; }
 
     //setters
@@ -58,7 +58,7 @@ public class  Movie {
     public void setActors(String actors) { this.actors = actors; }
     public void setGenre(String genre) { this.genre = genre; }
     public void setRatings(String ratings) { this.ratings = ratings; }
-    public void setReleaseYear(int year){this.releaseYear=year;}
+    public void setReleaseYear(int year) {this.releaseYear = year; }
     public void setId(Long id) { this.id = id; }
 
 }

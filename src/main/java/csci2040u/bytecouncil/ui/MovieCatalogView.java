@@ -28,7 +28,7 @@ import csci2040u.bytecouncil.backend.MovieCsvWriter;
 @RouteAlias("user")
 @AnonymousAllowed
 public class MovieCatalogView extends VerticalLayout {
-    public MovieCatalogView(MovieCsvWriter movieCsvWriter, AuthenticationContext authCont){
+    public MovieCatalogView(MovieCsvWriter movieCsvWriter, AuthenticationContext authCont) {
 
         HorizontalLayout headerLayout = new HorizontalLayout();
         headerLayout.setWidth("100%"); // Make the header take full width

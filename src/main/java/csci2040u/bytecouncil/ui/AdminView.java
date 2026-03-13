@@ -22,12 +22,12 @@ import jakarta.annotation.security.RolesAllowed;
 @Route("admin")
 @RolesAllowed("ADMIN")
 public class AdminView extends VerticalLayout {
-    public AdminView(MovieDatabaseCommands commands){
+    public AdminView(MovieDatabaseCommands commands) {
         //creates the grid for the movie databases
-        var crud=new GridCrud<>(Movie.class,commands);
+        var crud = new GridCrud<>(Movie.class,commands);
 
         //lists columns that can be viewed
-        crud.getGrid().setColumns( "name",  "actors",  "genre",  "ratings", "releaseYear", "posterURL","id");
+        crud.getGrid().setColumns( "name",  "actors",  "genre",  "ratings", "releaseYear", "posterURL", "id");
 
                 // Keep edit form fields aligned with add form fields.
                 String[] editableFields = {"name", "actors", "genre", "ratings", "releaseYear", "posterURL"};
