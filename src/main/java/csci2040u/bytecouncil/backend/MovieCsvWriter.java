@@ -1,5 +1,8 @@
 package csci2040u.bytecouncil.backend;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -202,5 +205,29 @@ public class MovieCsvWriter {
     private String defaultIfMissing(String value) {
         // Missing CSV fields are surfaced as N/A in UI cards
         return value == null || value.isBlank() ? "N/A" : value;
+    }
+
+    // bulk import movies from another .csv file, assuming the same header structure
+    public void importMoviesBulk(File csvFile) {
+//        MovieDatabaseCommands mdc = new MovieDatabaseCommands();
+        try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
+            reader.readLine(); // skip the headers
+            String line;
+            while ((line = reader.readLine()) != null) {
+                List<String> parsedLine = parseCsvLine(line);
+                Movie movie = new Movie();
+                movie.setId(parseId(getValue(parsedLine, 0)));
+                movie.setName(defaultIfMissing(getValue(parsedLine, 1)));
+                movie.setPosterURL(defaultIfMissing(getValue(parsedLine, 2)));
+                movie.setActors(defaultIfMissing(getValue(parsedLine, 3)));
+                movie.setGenre(defaultIfMissing(getValue(parsedLine, 4)));
+                movie.setRatings(defaultIfMissing(getValue(parsedLine, 5)));
+                movie.setReleaseYear(parseReleaseYear(getValue(parsedLine, 6)));
+
+//                mdc.add(movie);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
