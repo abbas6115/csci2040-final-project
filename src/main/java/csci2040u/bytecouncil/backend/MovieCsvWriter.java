@@ -224,7 +224,7 @@ public class MovieCsvWriter {
                 movie.setRatings(defaultIfMissing(getValue(parsedLine, 5)));
                 movie.setReleaseYear(parseReleaseYear(getValue(parsedLine, 6)));
 
-//                mdc.add(movie);
+                appendMovie(movie);
             }
         } catch (IOException e) {
             e.printStackTrace();
