@@ -1,6 +1,5 @@
 .idea/
 target/
 OLDJFRAME
-.gitignore
-src/main/frontend/styles
 *.iml
+/src/main/frontend/styles/

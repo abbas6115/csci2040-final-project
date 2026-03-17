@@ -2,5 +2,4 @@ id,name,posterURL,actors,genre,ratings,releaseYear
 "1","Snow White","NA","Test","Animated","8.6","1988"
 "2","Terminator","https://m.media-amazon.com/images/M/MV5BZmE0YzIxM2QtMGNlMi00MjRmLWE3MWMtOWQzMGVjMmU0YTFmXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg","Arnold Schwarzenegger","Action","8.1","1984"
 "3","Ferris Bueller","NA","NA","Comedy","10.0","1999"
-"4","NA","NA","NA","NA","0.0","0"
-"6","test1","NA","NA","Comedy","0.1","2026"
+
