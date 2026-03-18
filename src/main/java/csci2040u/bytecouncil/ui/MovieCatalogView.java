@@ -9,6 +9,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -38,10 +39,18 @@ public class MovieCatalogView extends VerticalLayout {
             UI.getCurrent().navigate(AdminView.class);
         });
         adminButton.setVisible(authCont.hasRole("ADMIN"));
+
+        Button signInButton = new Button("Sign in", event -> {
+            UI.getCurrent().navigate(LoginView.class);
+        });
+        signInButton.setVisible(!authCont.isAuthenticated());
+        Span spacer=new Span();
+        headerLayout.expand(spacer);
+
         H1 title = new H1("Movie Catalog View");
 
 
-        headerLayout.add(title, adminButton);
+        headerLayout.add(title, adminButton,spacer,signInButton);
 
 
         add(headerLayout);
