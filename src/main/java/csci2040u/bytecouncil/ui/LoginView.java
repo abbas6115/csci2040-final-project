@@ -34,7 +34,6 @@ public class  LoginView extends VerticalLayout implements BeforeEnterObserver {
 
         setAlignItems(Alignment.END);
 
-
         //Login
         VerticalLayout loginPanel=new VerticalLayout();
         loginPanel.getStyle().set("border", "1px solid #d3d3d3");
@@ -45,11 +44,12 @@ public class  LoginView extends VerticalLayout implements BeforeEnterObserver {
         login=new LoginForm();
         login.setAction(login_path);
         login.setForgotPasswordButtonVisible(false);
+
+
         //Login form settings
         LoginI18n customForm=LoginI18n.createDefault();
         LoginI18n.Form editForm= customForm.getForm();
 
-        loginPanel.add(new RouterLink("Register",RegisterView.class));
 
         setSizeFull();
         var contentDiv=new Div(login);

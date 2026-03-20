@@ -3,9 +3,16 @@ package csci2040u.bytecouncil.ui;
 
 import java.util.Locale;
 
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.contextmenu.ContextMenu;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.spring.security.AuthenticationContext;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.vaadin.crudui.crud.CrudOperation;
 import org.vaadin.crudui.crud.impl.GridCrud;
 
@@ -22,7 +29,7 @@ import jakarta.annotation.security.RolesAllowed;
 @Route("admin")
 @RolesAllowed("ADMIN")
 public class AdminView extends VerticalLayout {
-    public AdminView(MovieDatabaseCommands commands) {
+    public AdminView(MovieDatabaseCommands commands, AuthenticationContext authCont) {
         //creates the grid for the movie databases
         var crud = new GridCrud<>(Movie.class,commands);
 
@@ -33,6 +40,8 @@ public class AdminView extends VerticalLayout {
                 String[] editableFields = {"name", "actors", "genre", "ratings", "releaseYear", "posterURL"};
                 crud.getCrudFormFactory().setVisibleProperties(CrudOperation.ADD, editableFields);
                 crud.getCrudFormFactory().setVisibleProperties(CrudOperation.UPDATE, editableFields);
+
+
 
                 // Explicitly wire button operations to backend command handlers.
                 crud.setAddOperation(commands::add);
@@ -61,12 +70,32 @@ public class AdminView extends VerticalLayout {
         H1 title = new H1("Admin view");
         headerLayout.add(title, catalogButton);
 
+        //logout from
+        HorizontalLayout userPanel=new HorizontalLayout();
+        String username = authCont.getAuthenticatedUser(UserDetails.class).get().getUsername();
+        Text userlabel=new Text(username);
+        Span spacer=new Span();
+        headerLayout.expand(spacer);
+        userPanel.add(new Icon(VaadinIcon.USER),userlabel);
+        headerLayout.add(spacer,userPanel);
+
+        ContextMenu menu = new ContextMenu(userPanel);
+
+        menu.setOpenOnClick(true);
+
+        menu.addItem("Logout", e -> {
+            authCont.logout();
+            UI.getCurrent().getPage().setLocation("");
+        });
+
         //add components to page
-        add(
-                headerLayout,
-                searchField,
-                crud
-        );
+        if(authCont.hasRole("ADMIN")) {
+            add(
+                    headerLayout,
+                    searchField,
+                    crud
+            );
+        }
     }
 
     // Helper method to check if a movie matches the search term

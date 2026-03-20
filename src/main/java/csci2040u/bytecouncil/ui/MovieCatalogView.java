@@ -4,12 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import com.nimbusds.jose.proc.SecurityContext;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -19,11 +24,16 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import com.vaadin.flow.server.VaadinServletRequest;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 
 import csci2040u.bytecouncil.backend.Movie;
 import csci2040u.bytecouncil.backend.MovieCsvWriter;
+import org.apache.catalina.User;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 //Anonymous allowed tells springboot you don't need to login to access this page
 //route("") tells its default page, we can change this later
@@ -32,28 +42,8 @@ import csci2040u.bytecouncil.backend.MovieCsvWriter;
 @AnonymousAllowed
 public class MovieCatalogView extends VerticalLayout {
     public MovieCatalogView(MovieCsvWriter movieCsvWriter, AuthenticationContext authCont) {
-
-        HorizontalLayout headerLayout = new HorizontalLayout();
-        headerLayout.setWidth("100%"); // Make the header take full width
-        Button adminButton = new Button("Admin View", event -> {
-            UI.getCurrent().navigate(AdminView.class);
-        });
-        adminButton.setVisible(authCont.hasRole("ADMIN"));
-
-        Button signInButton = new Button("Sign in", event -> {
-            UI.getCurrent().navigate(LoginView.class);
-        });
-        signInButton.setVisible(!authCont.isAuthenticated());
-        Span spacer=new Span();
-        headerLayout.expand(spacer);
-
-        H1 title = new H1("Movie Catalog View");
-
-
-        headerLayout.add(title, adminButton,spacer,signInButton);
-
-
-        add(headerLayout);
+        Header header=new Header(authCont);
+        add(header);
 
         // Create a search field to filter movies by name in the grid
         TextField searchField = new TextField("Search movies");
