@@ -46,7 +46,7 @@ public class MovieCatalogApplication extends VaadinWebSecurity {
 
     //create temporary user variables
     @Bean
-    public UserDetailsService userDetailsServiceBean()throws  Exception {
+    public UserDetailsService userDetailsServiceBean() throws  Exception {
         return new InMemoryUserDetailsManager(
                 User.withUsername("Admin1")
                         .password("{noop}password")
