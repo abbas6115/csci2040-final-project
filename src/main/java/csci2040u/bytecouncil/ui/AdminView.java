@@ -11,6 +11,8 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.vaadin.crudui.crud.CrudOperation;
@@ -27,9 +29,13 @@ import csci2040u.bytecouncil.backend.MovieDatabaseCommands;
 import jakarta.annotation.security.RolesAllowed;
 
 @Route("admin")
-@RolesAllowed("ADMIN")
-public class AdminView extends VerticalLayout {
-    public AdminView(MovieDatabaseCommands commands, AuthenticationContext authCont) {
+@RolesAllowed({"ADMIN"})
+public class AdminView extends VerticalLayout implements BeforeEnterObserver {
+    AuthenticationContext authCont;
+
+    public AdminView(MovieDatabaseCommands commands, AuthenticationContext authenticationContext) {
+        this.authCont=authenticationContext;
+
         //creates the grid for the movie databases
         var crud = new GridCrud<>(Movie.class,commands);
 
@@ -70,9 +76,12 @@ public class AdminView extends VerticalLayout {
         H1 title = new H1("Admin view");
         headerLayout.add(title, catalogButton);
 
-        //logout from
+        //logout from admin
         HorizontalLayout userPanel=new HorizontalLayout();
-        String username = authCont.getAuthenticatedUser(UserDetails.class).get().getUsername();
+        String username="";
+        if(authCont.getAuthenticatedUser(UserDetails.class).isPresent()) {
+            username = authCont.getAuthenticatedUser(UserDetails.class).get().getUsername();
+        }
         Text userlabel=new Text(username);
         Span spacer=new Span();
         headerLayout.expand(spacer);
@@ -95,6 +104,8 @@ public class AdminView extends VerticalLayout {
                     searchField,
                     crud
             );
+        } else {
+
         }
     }
 
@@ -110,5 +121,12 @@ public class AdminView extends VerticalLayout {
 
     private boolean contains(String value, String searchTerm) {
         return value != null && value.toLowerCase(Locale.ROOT).contains(searchTerm);
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        if (!authCont.hasRole("ADMIN")) {
+            event.rerouteTo(""); // Or another page
+        }
     }
 }
