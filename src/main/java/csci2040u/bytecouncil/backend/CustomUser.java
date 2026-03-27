@@ -12,7 +12,7 @@ public class CustomUser implements UserDetails {
 
     private String username;
     private String password;
-    private Queue<Movie> recentlyWatched = new LinkedList<>();
+    private LinkedList<Movie> recentlyWatched = new LinkedList<>();
 
     public CustomUser(String username, String password) {
         this.username = username;
@@ -23,7 +23,9 @@ public class CustomUser implements UserDetails {
         recentlyWatched.add(movie);
     }
 
-    public Queue<Movie> getRecentlyWatched() { return recentlyWatched; }
+    public LinkedList<Movie> getRecentlyWatched() { return recentlyWatched; }
+
+    public void removeMovieWatchList(Movie movie) {recentlyWatched.remove(movie);}
 
     @Override
     public String getUsername() { return username; }
