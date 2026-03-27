@@ -6,6 +6,7 @@ package csci2040u.bytecouncil;
 localhost:8080/login will get you to default login screen. Temp account Admin1 with password. This will take you to login
 */
 
+import csci2040u.bytecouncil.backend.CustomUser;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -46,16 +47,17 @@ public class MovieCatalogApplication extends VaadinWebSecurity {
 
     //create temporary user variables
     @Bean
-    public UserDetailsService userDetailsServiceBean() throws  Exception {
-        return new InMemoryUserDetailsManager(
-                User.withUsername("Admin1")
-                        .password("{noop}password")
-                        .roles("ADMIN")
-                        .build(),
-                User.withUsername("User1")
-                        .password("{noop}password")
-                        .roles("USER")
-                        .build()
-        );
+    public UserDetailsService userDetailsServiceBean() {
+        // Create our CustomUsers
+        CustomUser admin = new CustomUser("Admin1", "{noop}password", "ADMIN");
+        CustomUser user = new CustomUser("User1", "{noop}password", "USER");
+
+        // We use a custom implementation of UserDetailsService
+        // that returns our CustomUser objects
+        return username -> {
+            if ("Admin1".equals(username)) return admin;
+            if ("User1".equals(username)) return user;
+            throw new org.springframework.security.core.userdetails.UsernameNotFoundException("User not found");
+        };
     }
 }

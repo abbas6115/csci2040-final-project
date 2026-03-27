@@ -1,6 +1,7 @@
 package csci2040u.bytecouncil.backend;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -12,18 +13,20 @@ public class CustomUser implements UserDetails {
 
     private String username;
     private String password;
-    private Queue<Movie> recentlyWatched = new LinkedList<>();
+    private String role;
+    private LinkedList<Movie> recentlyWatched = new LinkedList<>();
 
-    public CustomUser(String username, String password) {
+    public CustomUser(String username, String password, String role) {
         this.username = username;
         this.password = password;
+        this.role = role;
     }
 
     public void addToWatchlist(Movie movie) {
         recentlyWatched.add(movie);
     }
 
-    public Queue<Movie> getRecentlyWatched() { return recentlyWatched; }
+    public LinkedList<Movie> getRecentlyWatched() { return recentlyWatched; }
 
     @Override
     public String getUsername() { return username; }
@@ -32,7 +35,7 @@ public class CustomUser implements UserDetails {
     public String getPassword() { return password; }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() { return List.of(); }
+    public Collection<? extends GrantedAuthority> getAuthorities() { return List.of(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase())); }
 
     @Override
     public boolean isAccountNonExpired() { return true; }
