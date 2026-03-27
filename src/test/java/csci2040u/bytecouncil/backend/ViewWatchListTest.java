@@ -22,7 +22,7 @@ public class ViewWatchListTest {
         Movie transformers = new Movie("Transformers", "poster", "Megan", "Fantasy", "9.0", 2002);
         user.addToWatchlist(transformers);
 
-        //Initialize results
+        //Pull watchlist
         LinkedList<Movie> result = user.getRecentlyWatched();
 
         //Test size of queue (2)
@@ -48,7 +48,7 @@ public class ViewWatchListTest {
 
     @Test
     void QueueNotModifiedAfterView() {
-        // Arrange
+        //Initialize
         CustomUser user = new CustomUser("user1", "password");
 
         Movie dune = new Movie("Dune", "poster", "Timothee", "Sci-Fi", "8.0", 2021);
@@ -57,15 +57,19 @@ public class ViewWatchListTest {
         user.addToWatchlist(dune);
         user.addToWatchlist(transformers);
 
+        //pull watchlist
         LinkedList<Movie> result = user.getRecentlyWatched();
 
+        //Check size & first movie
         assertEquals(2, result.size());
         assertEquals(dune, result.get(0));
 
+        //remove movie
         user.removeMovieWatchList(transformers);
 
         result = user.getRecentlyWatched();
 
+        //Check size and first movie again
         assertEquals(1, result.size());
         assertEquals(transformers, result.get(0));
     }
