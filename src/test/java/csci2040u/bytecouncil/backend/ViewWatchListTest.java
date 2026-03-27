@@ -13,7 +13,7 @@ public class ViewWatchListTest {
     @Test
     void WatchListUpdated() {
         //Initialize user
-        CustomUser user = new CustomUser("user1", "password");
+        CustomUser user = new CustomUser("user1", "password", "user");
 
         //Create and add movie to watch list
         Movie dune = new Movie("Dune", "poster", "Timothee", "Sci-Fi", "8.0", 2021);
@@ -38,7 +38,7 @@ public class ViewWatchListTest {
     @Test
     void WatchListEmpty() {
         //initialize components
-        CustomUser user = new CustomUser("user1", "password");
+        CustomUser user = new CustomUser("user1", "password", "user");
         Movie dune = new Movie("Dune", "poster", "Timothee", "Sci-Fi", "8.0", 2021);
         user.addToWatchlist(dune);
 
@@ -49,7 +49,7 @@ public class ViewWatchListTest {
     @Test
     void QueueNotModifiedAfterView() {
         //Initialize
-        CustomUser user = new CustomUser("user1", "password");
+        CustomUser user = new CustomUser("user1", "password", "user");
 
         Movie dune = new Movie("Dune", "poster", "Timothee", "Sci-Fi", "8.0", 2021);
         Movie transformers = new Movie("Transformers", "poster", "Megan", "Fantasy", "9.0", 2002);
