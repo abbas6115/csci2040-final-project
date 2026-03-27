@@ -20,8 +20,11 @@ import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 
+import csci2040u.bytecouncil.backend.CustomUser;
 import csci2040u.bytecouncil.backend.Movie;
 import csci2040u.bytecouncil.backend.MovieCsvWriter;
+import csci2040u.bytecouncil.ui.mainviewcomp.Header;
+import csci2040u.bytecouncil.ui.mainviewcomp.WatchHistorySidebar;
 
 //Anonymous allowed tells springboot you don't need to login to access this page
 //route("") tells its default page, we can change this later
@@ -29,12 +32,27 @@ import csci2040u.bytecouncil.backend.MovieCsvWriter;
 @RouteAlias("user")
 @AnonymousAllowed
 public class MovieCatalogView extends VerticalLayout {
-    public MovieCatalogView(MovieCsvWriter movieCsvWriter, AuthenticationContext authCont) {
+    AuthenticationContext authCont;
+
+    public MovieCatalogView(MovieCsvWriter movieCsvWriter, AuthenticationContext authenticationContext) {
+        this.authCont=authenticationContext;
+        this.getStyle().set("min-height", "100vh");
         Header header=new Header(authCont);
+        UIAssests.setSecondary(header);
+        header.setHeight("10%");
         add(header);
+        header.getStyle().set("margin-left", "-16px");
+        header.getStyle().set("margin-right", "-16px");
+        header.getStyle().set("width", "calc(100% + 32px)");
+        UIAssests.setMainBackground(this);
+        this.getStyle().set("padding-top", "0");
+
+        sidebarInit();
+
 
         // Create a search field to filter movies by name in the grid
         TextField searchField = new TextField("Search movies");
+        searchField.getElement().getStyle().set("color", UIAssests.TEXTCOLORHEADER);
         searchField.setPlaceholder("Search by movie name");
         searchField.setClearButtonVisible(true);
         searchField.setWidthFull();
@@ -47,12 +65,16 @@ public class MovieCatalogView extends VerticalLayout {
         Integer[] minYearFilter = {null};
         Integer[] maxYearFilter = {null};
 
+        VerticalLayout movieListPanel = new VerticalLayout();
+
         Div catalogGrid =new Div();
         // Render a compact 3-column card grid on the main page
+        catalogGrid.getStyle().set("margin-left", "auto");
+        catalogGrid.getStyle().set("margin-right", "auto");
         catalogGrid.getStyle().set("display", "grid");
-        catalogGrid.getStyle().set("grid-template-columns", "repeat(3, minmax(0, 1fr))");
+        catalogGrid.getStyle().set("grid-template-columns", "repeat(5, minmax(0, 1fr))");
         catalogGrid.getStyle().set("gap", "10px");
-        catalogGrid.getStyle().set("width", "100%");
+        catalogGrid.getStyle().set("width", "80%");
 
         List<Movie> allMovies = new ArrayList<>(movieCsvWriter.readMovies());
 
@@ -68,7 +90,7 @@ public class MovieCatalogView extends VerticalLayout {
                 maxYearFilter[0]
         );
 
-            // Prompt for a genre value and apply it as a case-insensitive contains filter
+        // Prompt for a genre value and apply it as a case-insensitive contains filter
         Button genreFilterButton = new Button("Filter Genre", event -> {
             Dialog dialog = new Dialog();
             dialog.setHeaderTitle("Filter by Genre");
@@ -224,6 +246,33 @@ public class MovieCatalogView extends VerticalLayout {
         add(searchField, filterButtons, catalogGrid);
     }
 
+    private void sidebarInit() {
+        // 1. Initialize the sidebar
+        WatchHistorySidebar historySidebar = new WatchHistorySidebar();
+
+        // 2. Create the floating "Purple Tab" button
+        Button historyBtn = new Button("Watch History", e -> historySidebar.toggle());
+
+        // Core Styling to match your diagram
+        historyBtn.setWidth("120px");
+        historyBtn.setHeight("40px");
+        historyBtn.getStyle().set("position", "fixed");
+        historyBtn.getStyle().set("left", "0");       // Anchored to left wall
+        historyBtn.getStyle().set("top", "25%");      // Positioned vertically like your drawing
+        historyBtn.getStyle().set("z-index", "999");  // Just below the sidebar (1000)
+
+        // Visual Styling (Purple theme)
+        historyBtn.getStyle().set("background-color", UIAssests.SECONDARYOUTLINE);
+        historyBtn.getStyle().set("color", "white");
+        historyBtn.getStyle().set("border-radius", "0 5px 5px 0"); // Rounded only on the right
+        historyBtn.getStyle().set("border", "none");
+        historyBtn.getStyle().set("cursor", "pointer");
+
+        // 3. Add both to the view
+        add(historySidebar.getBackdrop(), historySidebar);
+        add(historyBtn);
+    }
+
     // Helper method to refresh the catalog grid based on all activ filters
     private void refreshCatalog(
             Div catalogGrid,
@@ -238,7 +287,48 @@ public class MovieCatalogView extends VerticalLayout {
         catalogGrid.removeAll();
         for (Movie movie : allMovies){
             if (matchesAllFilters(movie, searchTerm, genreFilter, minRating, maxRating, minYear, maxYear)) {
-                catalogGrid.add(new MovieCard(movie));
+                MovieCard movieCard = new MovieCard(movie);
+                movieCard.addClickListener(event -> {
+                    openMovieDetails(movie);
+                    addMovieToHistory(movie,authCont);
+                });
+                catalogGrid.add(movieCard);
+            }
+        }
+    }
+
+    public static void openMovieDetails(Movie movie) {
+
+        Dialog detailDialog = new Dialog();
+
+        // Closes the dialog when los focus
+        detailDialog.setCloseOnOutsideClick(true);
+        // Closes the dialog if the user presses the 'Esc' key
+        detailDialog.setCloseOnEsc(true);
+        // Modal ensures the background is dimmed and inactive
+        detailDialog.setModal(true);
+
+        // Setting behaviors
+        detailDialog.setCloseOnOutsideClick(true);
+        detailDialog.setCloseOnEsc(true);
+        detailDialog.getElement().getStyle().set("--lumo-base-color", UIAssests.SECONDARYCOLOR);
+
+
+        MovieDetailsLayout content = new MovieDetailsLayout(movie);
+        detailDialog.add(content);
+        detailDialog.setWidth("80%");
+        detailDialog.setHeight("80%");
+        detailDialog.open();
+    }
+
+    private void addMovieToHistory(Movie movie, AuthenticationContext authCont) {
+        if(authCont.isAuthenticated()){
+            var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+
+            if (auth != null && auth.getPrincipal() instanceof CustomUser currentUser) {
+                // Now you can safely access your queue
+                List<Movie> history = currentUser.getRecentlyWatched();
+                currentUser.addToWatchlist(movie);
             }
         }
     }
