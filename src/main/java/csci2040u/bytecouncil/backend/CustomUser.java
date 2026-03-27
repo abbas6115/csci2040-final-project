@@ -23,7 +23,7 @@ public class CustomUser implements UserDetails {
     }
 
     public void addToWatchlist(Movie movie) {
-        recentlyWatched.add(movie);
+        recentlyWatched.addFirst(movie);
     }
 
     public LinkedList<Movie> getRecentlyWatched() { return recentlyWatched; }
