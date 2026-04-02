@@ -1,4 +1,4 @@
-package csci2040u.bytecouncil.ui.mainviewcomp;
+package csci2040u.bytecouncil.ui.movieviewcomp;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
@@ -7,9 +7,8 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import csci2040u.bytecouncil.backend.CustomUser;
 import csci2040u.bytecouncil.backend.Movie;
-import csci2040u.bytecouncil.ui.MovieCard;
 import csci2040u.bytecouncil.ui.MovieCatalogView;
-import csci2040u.bytecouncil.ui.UIAssests;
+import csci2040u.bytecouncil.ui.UIColors;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Queue;
@@ -27,7 +26,7 @@ public class WatchHistorySidebar extends VerticalLayout {
         this.getStyle().set("z-index", "1000");
 
         // Visual Styling
-        this.getStyle().set("background-color", UIAssests.SECONDARYOUTLINE); // Dark Background
+        this.getStyle().set("background-color", UIColors.SECONDARYOUTLINE); // Dark Background
         this.getStyle().set("border-right", "3px solid #6200ee");
         this.getStyle().set("box-shadow", "5px 0 15px rgba(0,0,0,0.5)"); // Shadow on the right
         this.setPadding(true);
@@ -125,12 +124,11 @@ public class WatchHistorySidebar extends VerticalLayout {
 
                     System.out.println(movie.getName());
 
-                    // Optional: Make the card a bit smaller to fit the 350px sidebar
                     card.setWidthFull();
                     card.getStyle().set("margin-bottom", "10px");
                     card.getStyle().set("flex-shrink", "0");
                     card.setWidthFull();
-                    card.setHeight("290"); // Or whatever your preferred fixed height is
+                    card.setHeight("290");
 
                     // Add click listener to close sidebar when a movie is selected
                     card.addClickListener(e -> {

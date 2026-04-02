@@ -23,8 +23,10 @@ import com.vaadin.flow.spring.security.AuthenticationContext;
 import csci2040u.bytecouncil.backend.CustomUser;
 import csci2040u.bytecouncil.backend.Movie;
 import csci2040u.bytecouncil.backend.MovieCsvWriter;
-import csci2040u.bytecouncil.ui.mainviewcomp.Header;
-import csci2040u.bytecouncil.ui.mainviewcomp.WatchHistorySidebar;
+import csci2040u.bytecouncil.ui.movieviewcomp.Header;
+import csci2040u.bytecouncil.ui.movieviewcomp.MovieCard;
+import csci2040u.bytecouncil.ui.movieviewcomp.MovieDetailsLayout;
+import csci2040u.bytecouncil.ui.movieviewcomp.WatchHistorySidebar;
 
 //Anonymous allowed tells springboot you don't need to login to access this page
 //route("") tells its default page, we can change this later
@@ -38,13 +40,13 @@ public class MovieCatalogView extends VerticalLayout {
         this.authCont=authenticationContext;
         this.getStyle().set("min-height", "100vh");
         Header header=new Header(authCont);
-        UIAssests.setSecondary(header);
+        UIColors.setSecondary(header);
         header.setHeight("10%");
         add(header);
         header.getStyle().set("margin-left", "-16px");
         header.getStyle().set("margin-right", "-16px");
         header.getStyle().set("width", "calc(100% + 32px)");
-        UIAssests.setMainBackground(this);
+        UIColors.setMainBackground(this);
         this.getStyle().set("padding-top", "0");
 
         sidebarInit();
@@ -52,7 +54,7 @@ public class MovieCatalogView extends VerticalLayout {
 
         // Create a search field to filter movies by name in the grid
         TextField searchField = new TextField("Search movies");
-        searchField.getElement().getStyle().set("color", UIAssests.TEXTCOLORHEADER);
+        searchField.getElement().getStyle().set("color", UIColors.TEXTCOLORHEADER);
         searchField.setPlaceholder("Search by movie name");
         searchField.setClearButtonVisible(true);
         searchField.setWidthFull();
@@ -250,20 +252,20 @@ public class MovieCatalogView extends VerticalLayout {
         // 1. Initialize the sidebar
         WatchHistorySidebar historySidebar = new WatchHistorySidebar();
 
-        // 2. Create the floating "Purple Tab" button
+
         Button historyBtn = new Button("Watch History", e -> historySidebar.toggle());
 
-        // Core Styling to match your diagram
+        //Styling
         historyBtn.setWidth("120px");
         historyBtn.setHeight("40px");
         historyBtn.getStyle().set("position", "fixed");
         historyBtn.getStyle().set("left", "0");       // Anchored to left wall
-        historyBtn.getStyle().set("top", "25%");      // Positioned vertically like your drawing
+        historyBtn.getStyle().set("top", "10%");      // Positioned vertically like your drawing
         historyBtn.getStyle().set("z-index", "999");  // Just below the sidebar (1000)
 
         // Visual Styling (Purple theme)
-        historyBtn.getStyle().set("background-color", UIAssests.SECONDARYOUTLINE);
-        historyBtn.getStyle().set("color", "white");
+        historyBtn.getStyle().set("background-color", UIColors.SECONDARYCOLOR);
+        historyBtn.getStyle().set("color", UIColors.TEXTCOLORHEADER);
         historyBtn.getStyle().set("border-radius", "0 5px 5px 0"); // Rounded only on the right
         historyBtn.getStyle().set("border", "none");
         historyBtn.getStyle().set("cursor", "pointer");
@@ -311,7 +313,7 @@ public class MovieCatalogView extends VerticalLayout {
         // Setting behaviors
         detailDialog.setCloseOnOutsideClick(true);
         detailDialog.setCloseOnEsc(true);
-        detailDialog.getElement().getStyle().set("--lumo-base-color", UIAssests.SECONDARYCOLOR);
+        detailDialog.getElement().getStyle().set("--lumo-base-color", UIColors.SECONDARYCOLOR);
 
 
         MovieDetailsLayout content = new MovieDetailsLayout(movie);
