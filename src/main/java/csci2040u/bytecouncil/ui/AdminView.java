@@ -104,8 +104,6 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
                     searchField,
                     crud
             );
-        } else {
-
         }
     }
 
