@@ -25,6 +25,7 @@ import csci2040u.bytecouncil.ui.movieviewcomp.WatchHistorySidebar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 //Anonymous allowed tells springboot you don't need to login to access this page
 //route("") tells its default page, we can change this later
@@ -80,7 +81,8 @@ public class MovieCatalogView extends VerticalLayout {
 
         List<Movie> allMovies = new ArrayList<>(movieCsvWriter.readMovies());
 
-        // Filter State Holders
+
+        // Keep  filter selections inmutable holders so button handlers can update them
         String[] genreFilter = {""};
         Double[] minRatingFilter = {null};
         Double[] maxRatingFilter = {null};
@@ -98,10 +100,9 @@ public class MovieCatalogView extends VerticalLayout {
         );
 
         // Filter Buttons
-        Button genreFilterButton = createGenreButton(genreFilter, applyFilters);
-        Button ratingFilterButton = createRatingButton(minRatingFilter, maxRatingFilter, applyFilters);
-        Button yearFilterButton = createYearButton(minYearFilter, maxYearFilter, applyFilters);
-        Button clearAllFiltersButton = new Button("Clear All Filters", event -> {
+        Button clearAllFiltersButton = header.getRemoveFilter();
+        clearAllFiltersButton.addClickListener(
+                event -> {
             genreFilter[0] = "";
             minRatingFilter[0] = null;
             maxRatingFilter[0] = null;
@@ -111,11 +112,21 @@ public class MovieCatalogView extends VerticalLayout {
             applyFilters.run();
         });
 
-        HorizontalLayout filterButtons = new HorizontalLayout(genreFilterButton, ratingFilterButton, yearFilterButton, clearAllFiltersButton);
-        filterButtons.setWidthFull();
-        filterButtons.setJustifyContentMode(JustifyContentMode.CENTER);
+        Button applyFiltersButton = header.getApplyFilter();
+        applyFiltersButton.addClickListener(
+                event -> {
+                    genreFilter[0] = header.getGenre();
+                    minRatingFilter[0] = parseRating(header.getMinRating());
+                    maxRatingFilter[0] = parseRating(header.getMaxRating());
+                    minYearFilter[0] = parseYear(header.getMinYear());
+                    maxYearFilter[0] = parseYear(header.getMinYear());
 
-        add(filterButtons, catalogGrid);
+                    System.out.print(header.getGenre());
+                    applyFilters.run();
+                });
+
+
+        add(catalogGrid);
 
         // Setup JS Infinite Scroll
         setupInfiniteScroll();
@@ -177,58 +188,8 @@ public class MovieCatalogView extends VerticalLayout {
         currentPage++;
     }
 
-
-
-    private Button createGenreButton(String[] genreFilter, Runnable applyFilters) {
-        return new Button("Filter Genre", event -> {
-            Dialog dialog = new Dialog();
-            TextField genreField = new TextField("Genre");
-            genreField.setValue(genreFilter[0]);
-            Button apply = new Button("Apply", e -> {
-                genreFilter[0] = genreField.getValue().trim();
-                applyFilters.run();
-                dialog.close();
-            });
-            dialog.add(genreField, apply);
-            dialog.open();
-        });
-    }
-
-    private Button createRatingButton(Double[] min, Double[] max, Runnable applyFilters) {
-        return new Button("Filter Rating", event -> {
-            Dialog dialog = new Dialog();
-            NumberField minF = new NumberField("Min");
-            NumberField maxF = new NumberField("Max");
-            minF.setValue(min[0]); maxF.setValue(max[0]);
-            Button apply = new Button("Apply", e -> {
-                min[0] = minF.getValue();
-                max[0] = maxF.getValue();
-                applyFilters.run();
-                dialog.close();
-            });
-            dialog.add(new VerticalLayout(minF, maxF, apply));
-            dialog.open();
-        });
-    }
-
-    private Button createYearButton(Integer[] min, Integer[] max, Runnable applyFilters) {
-        return new Button("Filter Year", event -> {
-            Dialog dialog = new Dialog();
-            IntegerField minF = new IntegerField("Min Year");
-            IntegerField maxF = new IntegerField("Max Year");
-            minF.setValue(min[0]); maxF.setValue(max[0]);
-            Button apply = new Button("Apply", e -> {
-                min[0] = minF.getValue();
-                max[0] = maxF.getValue();
-                applyFilters.run();
-                dialog.close();
-            });
-            dialog.add(new VerticalLayout(minF, maxF, apply));
-            dialog.open();
-        });
-    }
-
     private void sidebarInit() {
+        // 1. Initialize the sidebar
         WatchHistorySidebar historySidebar = new WatchHistorySidebar();
         Button historyBtn = new Button("Watch History", e -> historySidebar.toggle());
         historyBtn.getStyle().set("position", "fixed").set("left", "0").set("top", "10%").set("z-index", "999");
@@ -238,9 +199,19 @@ public class MovieCatalogView extends VerticalLayout {
     }
 
     public static void openMovieDetails(Movie movie) {
+
         Dialog detailDialog = new Dialog();
+
+        // Closes the dialog when los focus
         detailDialog.setCloseOnOutsideClick(true);
+        // Closes the dialog if the user presses the 'Esc' key
+        detailDialog.setCloseOnEsc(true);
+        // Modal ensures the background is dimmed and inactive
         detailDialog.setModal(true);
+
+        // Setting behaviors
+        detailDialog.setCloseOnOutsideClick(true);
+        detailDialog.setCloseOnEsc(true);
         detailDialog.getElement().getStyle().set("--lumo-base-color", UIColors.SECONDARYCOLOR);
         detailDialog.add(new MovieDetailsLayout(movie));
         detailDialog.setWidth("80%"); detailDialog.setHeight("80%");
@@ -256,32 +227,85 @@ public class MovieCatalogView extends VerticalLayout {
         }
     }
 
-    private boolean matchesAllFilters(Movie movie, String searchTerm, String genre, Double minR, Double maxR, Integer minY, Integer maxY) {
-        if (!matchesSearch(movie, searchTerm)) return false;
-        if (genre != null && !genre.isEmpty() && !contains(movie.getGenre(), genre.toLowerCase())) return false;
+    private boolean matchesAllFilters(
+            Movie movie,
+            String searchTerm,
+            String genreFilter,
+            Double minRating,
+            Double maxRating,
+            Integer minYear,
+            Integer maxYear
+    ) {
+        //Search term is always applied first
+        if (!matchesSearch(movie, searchTerm)) {
+            return false;
+        }
 
+        // Genre filter is a case-insensitive contains match
+        String normalizedGenre = genreFilter == null ? "" : genreFilter.trim().toLowerCase(Locale.ROOT);
+        if (!normalizedGenre.isEmpty() && !contains(movie.getGenre(), normalizedGenre)) {
+            return false;
+        }
+
+        // Ratings are stored as text in the model, so parse before comparison
         Double rating = parseRating(movie.getRatings());
-        if (minR != null && (rating == null || rating < minR)) return false;
-        if (maxR != null && (rating == null || rating > maxR)) return false;
+        if (minRating != null && (rating == null || rating < minRating)) {
+            return false;
+        }
+        if (maxRating != null && (rating == null || rating > maxRating)) {
+            return false;
+        }
 
-        return isInRange(movie.getReleaseYear(), minY, maxY);
+        // Year boundaries are inclusive
+        return isInRange(movie.getReleaseYear(), minYear, maxYear);
     }
 
+    // Helper method to check if a movie matches the search ter
     private boolean matchesSearch(Movie movie, String searchTerm) {
-        String norm = searchTerm == null ? "" : searchTerm.trim().toLowerCase();
-        return norm.isEmpty() || contains(movie.getName(), norm);
+        String normalizedSearch = searchTerm == null ? "" : searchTerm.trim().toLowerCase(Locale.ROOT);
+        if (normalizedSearch.isEmpty()) {
+            return true;
+        }
+
+        return contains(movie.getName(), normalizedSearch);
     }
 
-    private boolean contains(String value, String search) {
-        return value != null && value.toLowerCase().contains(search);
+    private boolean contains(String value, String searchTerm) {
+        return value != null && value.toLowerCase(Locale.ROOT).contains(searchTerm);
     }
 
+    // Safely parse rating text and ignore malformed values
     private Double parseRating(String value) {
-        try { return Double.valueOf(value.trim()); } catch (Exception e) { return null; }
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        try {
+            return Double.valueOf(value.trim());
+        }catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
-    private boolean isInRange(int val, Integer min, Integer max) {
-        if (min != null && val < min) return false;
-        return max == null || val <= max;
+    private Integer parseYear(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        try {
+            return Integer.valueOf(value.trim());
+        }catch (NumberFormatException ex) {
+            return null;
+        }
     }
+
+    // Evaluate an inclusive integer range where each bound is optional
+    private boolean isInRange(int value, Integer min, Integer max) {
+        if (min != null && value < min) {
+            return false;
+        }
+
+        return max == null || value <= max;
+    }
+
 }

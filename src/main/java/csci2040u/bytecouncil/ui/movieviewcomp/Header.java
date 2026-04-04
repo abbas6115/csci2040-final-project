@@ -2,94 +2,199 @@ package csci2040u.bytecouncil.ui.movieviewcomp;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
+import com.vaadin.flow.component.details.Details;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import csci2040u.bytecouncil.ui.AdminView;
 import csci2040u.bytecouncil.ui.LoginView;
 import csci2040u.bytecouncil.ui.UIColors;
+import lombok.Getter;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class Header extends HorizontalLayout {
-    TextField searchField;
-    public Header(AuthenticationContext authCont){
-        setHeight("60px");
-        getStyle().set("min-height", "60px"); // Prevents squishing
-        getStyle().set("max-height", "60px"); // Prevents stretching
+import java.util.List;
 
+@Getter
+public class Header extends HorizontalLayout {
+    private final TextField minYear;
+    private final TextField maxYear;
+    private final TextField minRating;
+    private final TextField maxRating;
+    private final TextField searchField;
+    private final Button applyFilter;
+    private final Button removeFilter;
+    Select<String> genreSelect;
+
+    private static final List<String> GENRE_OPTIONS = List.of(
+            "Drama", "Documentary", "Comedy", "Animation", "Horror",
+            "Romance", "Music", "Thriller", "Action", "Crime",
+            "Family", "Fantasy", "Adventure", "TV Movie",
+            "Science Fiction", "Mystery", "History", "War", "Western"
+    );
+
+    public Header(AuthenticationContext authCont) {
+        //   Header layout
+        setHeight("60px");
         setWidthFull();
         setPadding(false);
         setSpacing(false);
         setAlignItems(Alignment.CENTER);
-
         getStyle().set("background-color", UIColors.SECONDARYCOLOR);
-        getStyle().set("box-sizing", "border-box");
         getStyle().set("padding", "0 25px");
+        getStyle().set("box-sizing", "border-box");
+        getStyle().set("overflow", "visible");
 
-        // Title
+        HorizontalLayout leftSection = new HorizontalLayout();
+        leftSection.setAlignItems(Alignment.CENTER);
+        leftSection.getStyle().set("flex-shrink", "0");
         H1 title = new H1("Filmbase");
-        title.getStyle().set("color", UIColors.TEXTCOLORHEADER);
-        title.getStyle().set("margin", "0"); // REMOVES BROWSER DEFAULT SPACING
-        title.getStyle().set("line-height", "60px"); // Matches text height to header height
+        title.getStyle().set("color", UIColors.TEXTCOLORHEADER).set("margin", "0");
+        leftSection.add(title);
 
-        //  Admin Button
-        Button adminButton = new Button("Admin View", event -> {
-            UI.getCurrent().navigate(AdminView.class);
-        });
-        adminButton.getStyle().set("color", UIColors.TEXTCOLORHEADER);
-        adminButton.getStyle().set("margin-left", "20px");
-        adminButton.setVisible(authCont.hasRole("ADMIN"));
+        if (authCont.hasRole("ADMIN")) {
+            Button adminBtn = new Button("Admin", e -> UI.getCurrent().navigate(AdminView.class));
+            adminBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            adminBtn.getStyle().set("color", "white").set("margin-left", "15px");
+            leftSection.add(adminBtn);
+        }
+        add(leftSection);
 
-        add(title, adminButton);
-
-        // 3. Search TextField (Added between Admin and Sign In)
+        //   Search bar
         searchField = new TextField();
         searchField.setPlaceholder("Search movies...");
-        searchField.getStyle().set("margin", "0 20px");
-
-        // Styling for white background
-        searchField.getElement().getStyle().set("--lumo-contrast-10pct", "white"); // Sets the field background
+        searchField.setWidthFull();
+        searchField.getStyle().set("height", "32px");
+        searchField.getStyle().set("min-height", "32px");
+        searchField.getStyle().set("--lumo-text-field-size", "32px");
+        searchField.getStyle().set("--lumo-contrast-10pct", "white");
         searchField.getStyle().set("background-color", "white");
-        searchField.getStyle().set("border-radius", "5px");
+        searchField.getStyle().set("border-radius", "8px");
 
-        add(searchField);
+        Div searchWrapper = new Div();
+        searchWrapper.getStyle().set("position", "relative");
+        searchWrapper.getStyle().set("margin", "0 40px");
+        searchWrapper.getStyle().set("display", "flex");
+        searchWrapper.getStyle().set("align-items", "center");
+        searchWrapper.getStyle().set("flex-grow", "1");
+        searchWrapper.getStyle().set("max-width", "1200px");
+        searchWrapper.getStyle().set("overflow", "visible");
+        setFlexGrow(1.0, searchWrapper);
 
-        // This makes the field "Flexible". It will grow to occupy all available space.
-        setFlexGrow(1.0, searchField);
-        // 5. Right side logic
-        if(authCont.isAuthenticated()){
-            HorizontalLayout userPanel = new HorizontalLayout();
-            userPanel.setAlignItems(Alignment.CENTER);
-            userPanel.setSpacing(true);
+        Icon filterIcon = new Icon(VaadinIcon.FILTER);
+        filterIcon.getStyle().set("color", "#444");
+        filterIcon.getStyle().set("width", "22px");
+        filterIcon.getStyle().set("height", "22px");
 
+        Button filterButton = new Button(filterIcon);
+        filterButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        filterButton.getStyle().set("padding", "0").set("margin", "0 5px 0 0").set("min-width", "36px").set("height", "32px");
+        searchField.setSuffixComponent(filterButton);
+
+        // Filter dropdown
+        VerticalLayout filterDropdown = new VerticalLayout();
+        filterDropdown.setVisible(false);
+        filterDropdown.setSpacing(false);
+        filterDropdown.setPadding(true);
+        filterDropdown.setWidth("280px");
+        filterDropdown.getStyle()
+                .set("position", "absolute").set("top", "38px").set("right", "0")
+                .set("background-color", "white").set("border", "1px solid #d1d1d1")
+                .set("border-radius", "8px 0 8px 8px").set("z-index", "10000")
+                .set("box-shadow", "0 10px 30px rgba(0, 0, 0, 0.3)");
+
+        // Genre filter
+        genreSelect = new Select<>();
+        genreSelect.setItems(GENRE_OPTIONS);
+        genreSelect.setWidthFull();
+        Details genreDetails = new Details("Genre", genreSelect);
+        genreDetails.setWidthFull();
+
+        // Year filter
+        minYear = new TextField("Min Year");
+        maxYear = new TextField("Max Year");
+        minYear.setWidthFull(); maxYear.setWidthFull();
+        Details yearDetails = new Details("Year Range", new VerticalLayout(minYear, maxYear));
+        yearDetails.setWidthFull();
+
+        // Rating filter
+        minRating = new TextField("Min Rating");
+        maxRating = new TextField("Max Rating");
+        minRating.setWidthFull(); maxRating.setWidthFull();
+        Details ratingDetails = new Details("Rating Range", new VerticalLayout(minRating, maxRating));
+        ratingDetails.setWidthFull();
+
+        // actions
+        HorizontalLayout actions = new HorizontalLayout();
+        actions.setWidthFull();
+        actions.getStyle().set("margin-top", "15px");
+
+         applyFilter = new Button("Apply", e -> filterDropdown.setVisible(false));
+        applyFilter.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+
+         removeFilter = new Button("Remove", e -> {
+            genreSelect.clear();
+            minYear.clear(); maxYear.clear();
+            minRating.clear(); maxRating.clear();
+        });
+        removeFilter.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
+
+        actions.add(applyFilter, removeFilter);
+        actions.setFlexGrow(1, applyFilter, removeFilter);
+
+        filterDropdown.add(genreDetails, yearDetails, ratingDetails, actions);
+
+        filterButton.addClickListener(e -> filterDropdown.setVisible(!filterDropdown.isVisible()));
+        searchWrapper.add(searchField, filterDropdown);
+        add(searchWrapper);
+
+        // Auth section
+        HorizontalLayout authSection = new HorizontalLayout();
+        authSection.setAlignItems(Alignment.CENTER);
+        authSection.getStyle().set("flex-shrink", "0");
+
+        if (authCont.isAuthenticated()) {
             String username = authCont.getAuthenticatedUser(UserDetails.class).get().getUsername();
-            Span userlabel = new Span(username);
-            userlabel.getStyle().set("color", UIColors.TEXTCOLORHEADER);
-
-            Icon userIcon = new Icon(VaadinIcon.USER);
-            userIcon.setColor(UIColors.TEXTCOLORHEADER);
-
-            userPanel.add(userIcon, userlabel);
-            add(userPanel);
-
-            ContextMenu menu = new ContextMenu(userPanel);
-            menu.setOpenOnClick(true);
-            menu.addItem("Logout", e -> authCont.logout());
+            Button userMenuBtn = new Button(username, new Icon(VaadinIcon.USER));
+            userMenuBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            userMenuBtn.getStyle().set("color", "white");
+            ContextMenu userMenu = new ContextMenu(userMenuBtn);
+            userMenu.setOpenOnClick(true);
+            userMenu.addItem("Logout", e -> authCont.logout());
+            authSection.add(userMenuBtn);
         } else {
-            Button signInButton = new Button("Sign in", event -> {
-                UI.getCurrent().navigate(LoginView.class);
-            });
-            signInButton.getStyle().set("color", UIColors.TEXTCOLORHEADER);
-            add(signInButton);
+            Button signIn = new Button("Sign in", e -> UI.getCurrent().navigate(LoginView.class));
+            signIn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            signIn.getStyle().set("color", "white");
+            authSection.add(signIn);
         }
+        add(authSection);
     }
 
-    public TextField getSearchField() {
-        return searchField;
+    public String getGenre(){
+        return genreSelect.getValue();
+    }
+
+    public String getMinYear(){
+        return minYear.getValue();
+    }
+
+    public String getMaxYear(){
+        return maxYear.getValue();
+    }
+
+    public String getMinRating(){
+        return minRating.getValue();
+    }
+
+    public String getMaxRating(){
+        return maxRating.getValue();
     }
 }
