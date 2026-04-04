@@ -3,6 +3,7 @@ package csci2040u.bytecouncil.ui.movieviewcomp;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.html.Div;
@@ -31,7 +32,8 @@ public class Header extends HorizontalLayout {
     private final TextField searchField;
     private final Button applyFilter;
     private final Button removeFilter;
-    Select<String> genreSelect;
+    // ComboBox is much more reliable for "breaking out" of absolute-positioned menus
+    ComboBox<String> genreSelect;
 
     private static final List<String> GENRE_OPTIONS = List.of(
             "Drama", "Documentary", "Comedy", "Animation", "Horror",
@@ -111,11 +113,22 @@ public class Header extends HorizontalLayout {
                 .set("box-shadow", "0 10px 30px rgba(0, 0, 0, 0.3)");
 
         // Genre filter
-        genreSelect = new Select<>();
+        genreSelect = new ComboBox<>();
         genreSelect.setItems(GENRE_OPTIONS);
         genreSelect.setWidthFull();
+        genreSelect.setPlaceholder("Select genre");
+
+
+        genreSelect.getElement().executeJs("this.$.overlay.style.zIndex = '11000'");
         Details genreDetails = new Details("Genre", genreSelect);
+        genreDetails.getStyle().set("position", "relative").set("z-index", "10001");
         genreDetails.setWidthFull();
+
+        // Display Genre dropdown over the field
+        genreSelect.getElement().executeJs(
+                "this.$.overlay.style.zIndex = '20000';" +
+                        "this.$.overlay.setAttribute('modeless', true);"
+        );
 
         // Year filter
         minYear = new TextField("Min Year");
@@ -136,10 +149,10 @@ public class Header extends HorizontalLayout {
         actions.setWidthFull();
         actions.getStyle().set("margin-top", "15px");
 
-         applyFilter = new Button("Apply", e -> filterDropdown.setVisible(false));
+        applyFilter = new Button("Apply", e -> filterDropdown.setVisible(false));
         applyFilter.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
 
-         removeFilter = new Button("Remove", e -> {
+        removeFilter = new Button("Remove", e -> {
             genreSelect.clear();
             minYear.clear(); maxYear.clear();
             minRating.clear(); maxRating.clear();
@@ -150,10 +163,28 @@ public class Header extends HorizontalLayout {
         actions.setFlexGrow(1, applyFilter, removeFilter);
 
         filterDropdown.add(genreDetails, yearDetails, ratingDetails, actions);
-
+        filterDropdown.getStyle().set("overflow", "visible");
         filterButton.addClickListener(e -> filterDropdown.setVisible(!filterDropdown.isVisible()));
         searchWrapper.add(searchField, filterDropdown);
         add(searchWrapper);
+
+        filterDropdown.getStyle()
+                .set("position", "absolute")
+                .set("z-index", "10000")
+                .set("overflow", "visible")
+                .set("top", "38px").set("right", "0")
+                .set("background-color", "white").set("border", "1px solid #d1d1d1")
+                .set("border-radius", "8px 0 8px 8px").set("z-index", "10000")
+                .set("box-shadow", "0 10px 30px rgba(0, 0, 0, 0.3)")
+                .set("overflow", "visible");
+
+        getStyle().set("overflow", "visible");
+        getStyle().set("z-index", "10");
+
+        searchWrapper.getStyle().set("overflow", "visible");
+
+
+
 
         // Auth section
         HorizontalLayout authSection = new HorizontalLayout();
