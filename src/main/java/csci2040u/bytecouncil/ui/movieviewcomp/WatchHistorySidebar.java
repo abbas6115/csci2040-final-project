@@ -122,7 +122,6 @@ public class WatchHistorySidebar extends VerticalLayout {
                 for (Movie movie : history) {
                     MovieCard card = new MovieCard(movie);
 
-                    System.out.println(movie.getName());
 
                     card.setWidthFull();
                     card.getStyle().set("margin-bottom", "10px");
