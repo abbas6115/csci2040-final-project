@@ -28,6 +28,8 @@ public class CustomUser implements UserDetails {
 
     public LinkedList<Movie> getRecentlyWatched() { return recentlyWatched; }
 
+    public void removeMovieWatchList(Movie movie) {recentlyWatched.remove(movie);}
+
     @Override
     public String getUsername() { return username; }
 

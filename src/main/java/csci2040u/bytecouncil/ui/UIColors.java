@@ -2,7 +2,7 @@ package csci2040u.bytecouncil.ui;
 
 import com.vaadin.flow.component.Component;
 
-public class UIAssests {
+public class UIColors {
     //used for background
     public static String DARKMODEBACKGROUND ="#1d1e26";
     public static String MOVIECARDBACKGROUND = "#212124";

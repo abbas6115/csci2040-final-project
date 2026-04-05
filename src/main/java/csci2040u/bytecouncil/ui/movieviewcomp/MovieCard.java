@@ -1,9 +1,10 @@
-package csci2040u.bytecouncil.ui;
+package csci2040u.bytecouncil.ui.movieviewcomp;
 
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import csci2040u.bytecouncil.backend.Movie;
+import csci2040u.bytecouncil.ui.UIColors;
 
 public class MovieCard extends VerticalLayout {
     public MovieCard(Movie movie){
@@ -25,14 +26,14 @@ public class MovieCard extends VerticalLayout {
         this.add(poster);
 
         Paragraph title=new Paragraph(valueOrNA(movie.getName()));
-        title.getStyle().setColor(UIAssests.TEXTCOLORHEADER);
+        title.getStyle().setColor(UIColors.TEXTCOLORHEADER);
 
         this.add(title);
 
         this.addClassName("movie-card");
         this.setSpacing(true);
         this.addClassName("sharp-corners");
-        this.getStyle().setBackground(UIAssests.MOVIECARDBACKGROUND);
+        this.getStyle().setBackground(UIColors.MOVIECARDBACKGROUND);
         this.getStyle().set("border-radius", "8px");
         this.getStyle().set("padding", "8px");
         this.getStyle().set("min-height", "160px");
