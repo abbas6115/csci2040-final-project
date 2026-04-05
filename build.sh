@@ -8,13 +8,13 @@ echo "------------------------------------------"
 echo "  $APP_NAME Build System"
 echo "------------------------------------------"
 
-# Helper function to launch the app
+# function that launches the app
 launch() {
     echo "[LAUNCH] Starting $APP_NAME..."
     ./mvnw spring-boot:run
 }
 
-# 1. Handle "run" logic separately
+# Handle run logic separately
 if [ "$1" == "run" ]; then
     if [ -f "$JAR_PATH" ]; then
         echo "[INFO] Build found. Skipping compilation..."
@@ -26,7 +26,11 @@ if [ "$1" == "run" ]; then
     fi
 fi
 
-# 2. Handle standard commands
+# handles standard command logic
+# test - cleans and packages with tests
+# notest - cleans and packages without testing
+# clean - cleans target directory
+# run - runs the file
 case "$1" in
     "test")
         echo "[MODE] Full Build WITH Unit Tests"
@@ -48,7 +52,7 @@ case "$1" in
         ;;
 esac
 
-# 3. Final execution check
+# Final execution check
 if [ $? -eq 0 ]; then
     echo "------------------------------------------"
     echo "Build Successful."
