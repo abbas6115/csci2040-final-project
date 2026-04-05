@@ -187,6 +187,13 @@
                                 <phase>compile</phase>
                             </execution>
                         </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.ow2.asm</groupId>
+                                <artifactId>asm</artifactId>
+                                <version>9.8</version>
+                            </dependency>
+                        </dependencies>
                     </plugin>
                 </plugins>
             </build>
