@@ -36,29 +36,38 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
     public AdminView(MovieDatabaseCommands commands, AuthenticationContext authenticationContext) {
         this.authCont=authenticationContext;
 
+        setSizeFull();
+
+        setPadding(false);
+        setSpacing(false);
+        getStyle().set("overflow", "hidden");
+
         //creates the grid for the movie databases
         var crud = new GridCrud<>(Movie.class,commands);
+        crud.getStyle().set("margin", "20px auto");
+        crud.getStyle().set("width", "95%");
 
         //lists columns that can be viewed
         crud.getGrid().setColumns( "name",  "actors",  "genre",  "ratings", "releaseYear", "posterURL", "id");
 
-                // Keep edit form fields aligned with add form fields.
-                String[] editableFields = {"name", "actors", "genre", "ratings", "releaseYear", "posterURL"};
-                crud.getCrudFormFactory().setVisibleProperties(CrudOperation.ADD, editableFields);
-                crud.getCrudFormFactory().setVisibleProperties(CrudOperation.UPDATE, editableFields);
+        // Keep edit form fields aligned with add form fields.
+        String[] editableFields = {"name", "actors", "genre", "ratings", "releaseYear", "posterURL"};
+        crud.getCrudFormFactory().setVisibleProperties(CrudOperation.ADD, editableFields);
+        crud.getCrudFormFactory().setVisibleProperties(CrudOperation.UPDATE, editableFields);
 
 
 
-                // Explicitly wire button operations to backend command handlers.
-                crud.setAddOperation(commands::add);
-                crud.setUpdateOperation(commands::update);
-                crud.setDeleteOperation(commands::delete);
+        // Explicitly wire button operations to backend command handlers.
+        crud.setAddOperation(commands::add);
+        crud.setUpdateOperation(commands::update);
+        crud.setDeleteOperation(commands::delete);
 
         // Create a search field to filter movies by name in the grid
         TextField searchField = new TextField("Search movies");
         searchField.setPlaceholder("Search by movie name");
         searchField.setClearButtonVisible(true);
-        searchField.setWidthFull();
+        searchField.getStyle().set("width", "95%");
+        searchField.getStyle().set("margin", "20px auto");
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
         searchField.addValueChangeListener(event -> {
             String searchTerm = event.getValue() == null ? "" : event.getValue();
@@ -71,9 +80,26 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
 
         // Make header
         HorizontalLayout headerLayout = new HorizontalLayout();
-        headerLayout.setWidth("100%"); // Make the header take full width
+        headerLayout.setWidthFull();
+        headerLayout.setHeight("60px");
+        headerLayout.getStyle().set("min-height", "60px");
+        headerLayout.getStyle().set("max-height", "60px");
+        headerLayout.getStyle().set("margin", "0");
+        headerLayout.getStyle().set("padding", "0 20px");
+        headerLayout.getStyle().set("display", "flex");
+        headerLayout.getStyle().set("align-items", "center");
+        headerLayout.getStyle().set("color", "#f8f9fa");
+
         Button catalogButton = new Button("MovieCatalogView", event -> {UI.getCurrent().navigate(MovieCatalogView.class);});
-        H1 title = new H1("Admin view");
+        catalogButton.getStyle().setColor(UIColors.TEXTCOLORHEADER);
+
+        H1 title = new H1("FilmBase");
+        title.getStyle().setColor(UIColors.TEXTCOLORHEADER);
+
+        // This stops the 20px padding from pushing the header past the screen width
+        headerLayout.getStyle().set("box-sizing", "border-box");
+        UIColors.setSecondary(headerLayout);
+        add(headerLayout);
         headerLayout.add(title, catalogButton);
 
         //logout from admin
@@ -82,10 +108,14 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
         if(authCont.getAuthenticatedUser(UserDetails.class).isPresent()) {
             username = authCont.getAuthenticatedUser(UserDetails.class).get().getUsername();
         }
-        Text userlabel=new Text(username);
+        Span userlabel=new Span(username);
+        userlabel.getStyle().set("color",UIColors.TEXTCOLORHEADER);
         Span spacer=new Span();
         headerLayout.expand(spacer);
-        userPanel.add(new Icon(VaadinIcon.USER),userlabel);
+
+        Icon userIcon=new Icon(VaadinIcon.USER);
+        userIcon.getStyle().set("color","white");
+        userPanel.add(userIcon,userlabel);
         headerLayout.add(spacer,userPanel);
 
         ContextMenu menu = new ContextMenu(userPanel);
