@@ -11,18 +11,26 @@ echo "------------------------------------------"
 # function that launches the app
 launch() {
     echo "[LAUNCH] Starting $APP_NAME..."
-    ./mvnw spring-boot:run
+    # Check if JAR exists to run directly, otherwise use mvnw
+    if [ -f "$JAR_PATH" ]; then
+        java -jar "$JAR_PATH"
+    else
+        ./mvnw spring-boot:run
+    fi
 }
 
-# Handle run logic separately
-if [ "$1" == "run" ]; then
+# run logic
+# store command in variable to allow redirection if the JAR is missing
+CMD="$1"
+
+if [ "$CMD" == "run" ]; then
     if [ -f "$JAR_PATH" ]; then
         echo "[INFO] Build found. Skipping compilation..."
         launch
         exit 0
     else
         echo "[INFO] No build found. Triggering full build with TESTS..."
-        set -- "test" # Redirects "run" to "test" logic below
+        CMD="test"
     fi
 fi
 
@@ -31,7 +39,7 @@ fi
 # notest - cleans and packages without testing
 # clean - cleans target directory
 # run - runs the file
-case "$1" in
+case "$CMD" in
     "test")
         echo "[MODE] Full Build WITH Unit Tests"
         ./mvnw clean package -Pproduction
@@ -58,7 +66,7 @@ if [ $? -eq 0 ]; then
     echo "Build Successful."
 
     # If the user started with 'run' (or was redirected there), launch now
-    if [ "$1" == "test" ] || [ "$1" == "notest" ]; then
+    if [[ "$1" == "run" || "$1" == "test" || "$1" == "notest" ]]; then
         launch
     fi
 else
