@@ -1,0 +1,52 @@
+package csci2040u.bytecouncil.backend;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.Collection;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringBootTest
+class MovieDatabaseCommandsIntegrationTest {
+
+    @Autowired
+    private MovieDatabaseCommands commands;
+
+    @Autowired
+    private MovieRepository movieRepository;
+
+    @Test
+    void addedMovieIsReturnedByFindAllWithGeneratedId() {
+        movieRepository.deleteAll();
+
+        Movie movie = new Movie("Dune", "poster", "Timothee", "Sci-Fi", "8.0", 2021);
+        commands.add(movie);
+
+        Collection<Movie> result = commands.findAll();
+
+        assertEquals(1, result.size());
+        Movie saved = result.iterator().next();
+        assertEquals("Dune", saved.getName());
+        assertNotNull(saved.getId());
+        assertTrue(saved.getId() > 0);
+    }
+
+    @Test
+    void updatedMovieReflectsNewNameInFindAll() {
+        movieRepository.deleteAll();
+
+        Movie movie = new Movie("Dune", "poster", "Timothee", "Sci-Fi", "8.0", 2021);
+        Movie saved = commands.add(movie);
+
+        saved.setName("Dune: Part Two");
+        commands.update(saved);
+
+        Collection<Movie> result = commands.findAll();
+
+        assertEquals(1, result.size());
+        assertEquals("Dune: Part Two", result.iterator().next().getName());
+        assertTrue(result.stream().noneMatch(m -> m.getName().equals("Dune")));
+    }
+}

@@ -1,15 +1,18 @@
 package csci2040u.bytecouncil.ui.movieviewcomp;
 
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+
 import csci2040u.bytecouncil.backend.Movie;
 import csci2040u.bytecouncil.ui.UIColors;
 
 public class MovieDetailsLayout extends VerticalLayout {
-    public MovieDetailsLayout(Movie movie){
+    public MovieDetailsLayout(Movie movie, Button addToWatchHistoryButton){
         this.setWidthFull();
         this.setPadding(true);
         this.setSpacing(true);
@@ -40,7 +43,12 @@ public class MovieDetailsLayout extends VerticalLayout {
         Paragraph name = new Paragraph(movie.getName());
         name.getStyle().set("color", UIColors.TEXTCOLORHEADER);
         name.getStyle().set("font-weight", "bold");
-        name.getStyle().set("margin-bottom", "5px");
+        name.getStyle().set("margin", "0");
+
+        HorizontalLayout nameRow = new HorizontalLayout(name, addToWatchHistoryButton);
+        nameRow.setWidthFull();
+        nameRow.setAlignItems(Alignment.CENTER);
+        nameRow.setJustifyContentMode(JustifyContentMode.BETWEEN);
 
         Span actors = new Span("Actors: " + movie.getActors());
         actors.getStyle().set("color", UIColors.TEXTCOLORHEADER);
@@ -58,7 +66,7 @@ public class MovieDetailsLayout extends VerticalLayout {
         ratings.getStyle().set("color", UIColors.TEXTCOLORHEADER);
         ratings.getStyle().set("font-size", "0.9em");
 
-        detailsBox.add(name, genre, actors, year, ratings);
+        detailsBox.add(nameRow, genre, actors, year, ratings);
 
         // Assemble the layout
         add(moviePoster, detailsBox);
