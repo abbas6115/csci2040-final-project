@@ -1,4 +1,4 @@
-package csci2040u.bytecouncil.ui.movieviewcomp;
+package csci2040u.bytecouncil.backend;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -11,7 +11,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 /*
 Wrapper Class for requesting trailers, and streaming services
@@ -69,7 +68,7 @@ public class TMBDRequest {
         });
     }
 
-    CompletableFuture<List<String>> getAllVideos(String movieId) {
+    public CompletableFuture<List<String>> getAllVideos(String movieId) {
         String url = BASE_URL + movieId + "/videos?api_key=" + apiKey;
 
         return makeRequest(url).thenApply(json -> {
