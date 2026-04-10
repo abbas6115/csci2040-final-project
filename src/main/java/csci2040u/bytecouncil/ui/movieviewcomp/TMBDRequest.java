@@ -10,14 +10,22 @@ import java.util.concurrent.CompletableFuture;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+/*
+Wrapper Class for requesting trailers, and streaming services
+ */
 
 public class TMBDRequest {
-
-    private final String apiKey = "fd51fcbdf9ac457fcea35d70bf437a1b";
     private final HttpClient client;
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
 
+    @Value("${{secrets.APIKEY}}")
+    private String apiKey;
+
     public TMBDRequest() {
+
         this.client = HttpClient.newHttpClient();
     }
 
@@ -147,41 +155,41 @@ public class TMBDRequest {
         });
     }
 
-    public static void main(String[] args) {
-        TMBDRequest tmdb = new TMBDRequest();
-
-        // Test ID: Insurgent (262500) or Fight Club (550)
-        String movieId = "262500";
-        String region = "US";
-
-        System.out.println("--- TMDB DATA FETCH FOR ID: " + movieId + " ---");
-
-        // 1. Print the First Trailer Link
-        tmdb.getFirstTrailer(movieId).thenAccept(url -> {
-            System.out.println("Trailer: " + url);
-        }).join();
-
-        // 2. Print Streaming Service Names (e.g., [Netflix, Paramount Plus])
-        tmdb.getStreamingServices(movieId, region).thenAccept(services -> {
-            System.out.println("Available on: " + services);
-        }).join();
-
-        // 3. Print Streaming Logos (Direct image links)
-        // Note: This uses the logic I provided in the previous turn
-        tmdb.getStreamingLogos(movieId, region).thenAccept(logos -> {
-            System.out.println("Service Logos: " + logos);
-        }).join();
-
-        tmdb.getAllVideos(movieId).thenAccept(videoList -> {
-            if (videoList.isEmpty()) {
-                System.out.println("No videos found.");
-            } else {
-                System.out.println("Total videos found: " + videoList.size());
-                videoList.forEach(url -> System.out.println(" - " + url));
-            }
-        }).join();
-
-        System.out.println("--- FETCH COMPLETE ---");
-
-    }
+//    testing
+//    public static void main(String[] args) {
+//        TMBDRequest tmdb = new TMBDRequest();
+//
+//        // Test ID: Insurgent (262500) or Fight Club (550)
+//        String movieId = "262500";
+//        String region = "US";
+//
+//        System.out.println("--- TMDB DATA FETCH FOR ID: " + movieId + " ---");
+//
+//        // 1. Print the First Trailer Link
+//        tmdb.getFirstTrailer(movieId).thenAccept(url -> {
+//            System.out.println("Trailer: " + url);
+//        }).join();
+//
+//        // 2. Print Streaming Service Names (e.g., [Netflix, Paramount Plus])
+//        tmdb.getStreamingServices(movieId, region).thenAccept(services -> {
+//            System.out.println("Available on: " + services);
+//        }).join();
+//
+//        // 3. Print Streaming Logos (Direct image links)
+//        // Note: This uses the logic I provided in the previous turn
+//        tmdb.getStreamingLogos(movieId, region).thenAccept(logos -> {
+//            System.out.println("Service Logos: " + logos);
+//        }).join();
+//
+//        tmdb.getAllVideos(movieId).thenAccept(videoList -> {
+//            if (videoList.isEmpty()) {
+//                System.out.println("No videos found.");
+//            } else {
+//                System.out.println("Total videos found: " + videoList.size());
+//                videoList.forEach(url -> System.out.println(" - " + url));
+//            }
+//        }).join();
+//
+//        System.out.println("--- FETCH COMPLETE ---");
+//    }
 }

@@ -6,16 +6,13 @@ package csci2040u.bytecouncil;
 localhost:8080/login will get you to default login screen. Temp account Admin1 with password. This will take you to login
 */
 
-import com.vaadin.flow.component.page.Push;
 import csci2040u.bytecouncil.backend.CustomUser;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 
