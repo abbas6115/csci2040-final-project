@@ -19,9 +19,7 @@ Wrapper Class for requesting trailers, and streaming services
 public class TMBDRequest {
     private final HttpClient client;
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
-
-    @Value("${{secrets.APIKEY}}")
-    private String apiKey;
+    private final String apiKey="fd51fcbdf9ac457fcea35d70bf437a1b";
 
     public TMBDRequest() {
 
