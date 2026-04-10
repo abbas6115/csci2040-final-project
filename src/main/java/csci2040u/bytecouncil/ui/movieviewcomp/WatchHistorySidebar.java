@@ -1,17 +1,18 @@
 package csci2040u.bytecouncil.ui.movieviewcomp;
 
+import java.util.Queue;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+
 import csci2040u.bytecouncil.backend.CustomUser;
 import csci2040u.bytecouncil.backend.Movie;
 import csci2040u.bytecouncil.ui.MovieCatalogView;
 import csci2040u.bytecouncil.ui.UIColors;
-import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.util.Queue;
 
 public class WatchHistorySidebar extends VerticalLayout {
     private final VerticalLayout backdrop = new VerticalLayout();
@@ -53,17 +54,6 @@ public class WatchHistorySidebar extends VerticalLayout {
         backdrop.addClickListener(e -> this.close());
 
         renderHeader();
-    }
-
-    private void renderList(){
-        Div catalogGrid =new Div();
-        // Render a compact 3-column card grid on the main page
-        catalogGrid.getStyle().set("margin-left", "auto");
-        catalogGrid.getStyle().set("margin-right", "auto");
-        catalogGrid.getStyle().set("display", "grid");
-        catalogGrid.getStyle().set("grid-template-columns", "repeat(1, minmax(0, 1fr))");
-        catalogGrid.getStyle().set("gap", "10px");
-        catalogGrid.getStyle().set("width", "80%");
     }
 
     private void renderHeader() {
@@ -121,7 +111,6 @@ public class WatchHistorySidebar extends VerticalLayout {
             } else {
                 for (Movie movie : history) {
                     MovieCard card = new MovieCard(movie);
-
 
                     card.setWidthFull();
                     card.getStyle().set("margin-bottom", "10px");

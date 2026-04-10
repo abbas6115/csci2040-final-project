@@ -107,6 +107,7 @@ public class MovieCsvWriter {
                 movie.setGenre(defaultIfMissing(getValue(values, 4)));
                 movie.setRatings(defaultIfMissing(getValue(values, 5)));
                 movie.setReleaseYear(parseReleaseYear(getValue(values, 6)));
+                movie.setTmdbID(defaultIfMissing(getValue(values, 7)));
 
                 //allows for the repository to set its own id and
 
@@ -130,7 +131,8 @@ public class MovieCsvWriter {
                 escape(movie.getActors()),
                 escape(movie.getGenre()),
                 escape(movie.getRatings()),
-                escape(Integer.toString(movie.getReleaseYear()))
+                escape(Integer.toString(movie.getReleaseYear())),
+                escape(movie.getTmdbID())
         );
     }
 
@@ -223,6 +225,7 @@ public class MovieCsvWriter {
                 movie.setGenre(defaultIfMissing(getValue(parsedLine, 4)));
                 movie.setRatings(defaultIfMissing(getValue(parsedLine, 5)));
                 movie.setReleaseYear(parseReleaseYear(getValue(parsedLine, 6)));
+                movie.setTmdbID(defaultIfMissing(getValue(parsedLine, 7)));
 
                 appendMovie(movie);
             }

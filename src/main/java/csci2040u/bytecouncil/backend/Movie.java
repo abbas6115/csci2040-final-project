@@ -21,7 +21,7 @@ public class  Movie {
     String genre;
     String ratings;
     int releaseYear;
-
+    String TmdbID;
 
 
     public Movie() {
@@ -31,6 +31,7 @@ public class  Movie {
         genre = "NA";
         ratings = "0.0";
         releaseYear = 0;
+        TmdbID="";
     }
 
     public Movie(String name, String posterURL, String actors, String genre, String ratings,int year) {
@@ -51,6 +52,7 @@ public class  Movie {
     public String getRatings() { return ratings; }
     public int getReleaseYear() {return releaseYear; }
     public Long getId() { return id; }
+    public String getTmdbID() { return TmdbID; }
 
     //setters
     public void setName(String name) { this.name = name; }
@@ -60,5 +62,6 @@ public class  Movie {
     public void setRatings(String ratings) { this.ratings = ratings; }
     public void setReleaseYear(int year) {this.releaseYear = year; }
     public void setId(Long id) { this.id = id; }
+    public void setTmdbID(String id) {TmdbID=id;}
 
 }

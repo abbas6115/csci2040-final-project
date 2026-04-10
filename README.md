@@ -1,59 +1,92 @@
-# Filmbase, a movie catalog service
-## CSCI 2040U Final Project
+# Filmbase
+
+Filmbase is a web application for browsing and viewing a catalog of countless movies and TV shows.
 
 ---
-### Basic setup instructions:
-This project is designed to run as a server for a webapp (website application) for users to access via their Internet browser of choice. 
 
-Ideally, no downloads or packages would be required, only a device with an Internet connection and a web browser. However, for the MVP 1.0, clone the project and open it in IntelliJ IDEA, and run the `MovieCatalogApplication.java` class to start the webserver.
+## Developer Documentation
 
-Open your Internet browser of choice, and in the URL tab, enter and go to the link `http://localhost:8080/login`. This will lead you to the login page of the app.
+### Prerequisites
 
-![Login page](images/README/login.png "Login page")
+Before you begin, ensure you have the following:
 
-Right now there is a demo view for both user and admin perspectives. The current placeholder login credentials are:
+- Java JDK 21
+- Maven (if not using IntelliJ IDEA as your IDE)
+- IntelliJ IDEA (recommended IDE for easy building)
+- Git
+
+### 1. Clone the repository
+
+Visit our project's [GitHub repository](https://github.com/abbas6115/csci2040-final-project/) and clone it to your machine.
+
+### 2. Open the project in your IDE
+
+Since this project was developed in IntelliJ IDEA, we will use it to demonstrate. Open the cloned project in IntelliJ and give it a few seconds to build the Maven project. IntelliJ should automatically do this, but if not, right click on the `pom.xml` and select *Add as Maven Project*.
+
+To run the webapp while in the project, run the Java class `MovieCatalogApplication`. This will begin hosting a webserver on `localhost:8080`, which you can connect to in your browser.
+
+### 3. Build the project
+
+You can build the project using Maven.
+
+**Using IntelliJ:**
+
+- Open the *Maven* tab on the right-hand side
+- Navigate to *Lifecycle*
+- Double-click (run):
+    - *clean*
+    - *package* ... in that order
+
+**Using terminal:**
+
+- Open a terminal window in the project's root directory
+- Run the command `mvn clean install`
+
+Using either of these methods should compile and build the project, which will take up to a minute. The packaged application will appear in the `target` directory as a *JAR* file.
+
+### 4. Run the application
+
+Now that you have the built application, you can run it outside of the IDE. **Note: double-clicking the executable JAR file will not run the program, as there is no UI for the server. You must run it in a terminal window**
+
+Open a terminal and navigate to the `target` directory, or wherever your JAR file is situated. Run the command `java -jar <filename>.jar` (<filename>.jar will most likely be similar to `csci2040-final-project-1.0.jar`). Give it a moment to start up the server.
+
+### 5. Access the webapp
+
+In your browser, connect to `localhost:8080` to open the Filmbase webapp. You will be prompted with a login screen and can use either of the two developer logins:
+
+- Admin:
+    - Admin1
+    - password
 - User:
-  - User1
-  - password
-- Admin
-  - Admin1
-  - password
-
-We'll start with the user view. Enter the user credentials and click "Log in".
-You will now be able to see the demo view of the main page, with a few different movie cards containing each movie's info.
-
-![User view of main page](images/README/userview.png "User view")
-
-The search bar currently only has search by movie name. Entering any string of characters (case-insensitive) that appear in any existing movie entry's name will only show that set of movies in the card view.
-
-For example, searching for "termi" will provide the following view:
-
-![Example of a search](images/README/searchexample.png "Search example")
-
-Now moving on to the admin view. Go back to the login page and enter the admin login credentials. You will now be greeted with the admin's exclusive database view of the movies rather than the home page of movie cards.
-
-![Admin's database view](images/README/admindatabaseview.png "Admin database view")
-
-This page shows a table version of all of the movie entries, with each movie having a name, actors, genre, ratings, release year, poster URL, and ID.
-
-The admin can add, edit, and delete entries in the table. Below is an example of adding an entry (after clicking the `+` button):
-
-![Adding a movie entry](images/README/addmovie.png "Add movie")
-
-Clicking `Add` will add that entry to the table. The admin can also click on an existing entry and edit or delete it by clicking the respective button. Notice how the buttons are no longer greyed out in the image shown:
-
-![Clicking on an entry](images/README/entry.png "Entry")
-
-Finally, the admin can also switch to a "user" view by clicking on the blue button in the top left, to the right of the page name. This button shows the name of what view you can switch to.
-
-![Switching to user view](images/README/adminuserview.png "Admin's user view")
-
-Notice how the button changed to `Admin View`, showing that is the page you can switch to. Also notice how the new entries are visible in the catalog view as well.
+    - User1
+    - password
 
 ---
-### The Byte Council:
-- Cai Penfold (Project Manager)
-- Abbas Syed (Technical Manager)
-- Shan Jeofry (Front-End Lead)
-- Muhammad Nabeel Khan (Back-End Lead)
-- Ethan Jallim (Software Quality Lead)
+
+## User Documentation
+
+### Prerequisites
+
+Before you begin, ensure you have Java 21 installed on your machine
+
+### 1. Download the latest release
+
+Visit our project's [GitHub repository](https://github.com/abbas6115/csci2040-final-project/) and navigate to the *Releases* page on the right-hand side. Click on the release marked *Latest*. You will see a page with three different downloadable files; click on the `.jar` file to download it (the other files are not required to download). Save it locally in a directory of your choice.
+
+### 2. Run the application
+
+As previously mentioned, double-clicking the executable will not run the program. Open a terminal window in the directory where your JAR file is saved and run `java -jar <filename>.jar`. Give it a moment to start up.
+
+### Access the webapp
+
+Once the application is fully up and running, you may access it from your browser. Connect to the URL `localhost:8080`, again, the page will prompt you with the login.
+
+---
+
+# The Byte Council
+
+- Project Manager: Cai Penfold
+- Technical Manager: Abbas Syed
+- Front-End Lead: Shan Jeofry
+- Back-End Lead: Muhammad Nabeel Khan
+- Software Quality Lead: Ethan Jallim

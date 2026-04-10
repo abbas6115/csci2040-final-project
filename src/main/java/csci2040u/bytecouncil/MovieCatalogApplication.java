@@ -12,15 +12,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 
 import csci2040u.bytecouncil.ui.LoginView;
 
 //@springBootApplication tells that this a webServer
+
 @SpringBootApplication
 @EnableMethodSecurity(jsr250Enabled = true)
 public class MovieCatalogApplication extends VaadinWebSecurity {
@@ -32,10 +31,16 @@ public class MovieCatalogApplication extends VaadinWebSecurity {
     //tells the program to use the loginView Class for security
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.headers(headers -> headers
+                .contentSecurityPolicy(csp -> csp
+                        .policyDirectives("frame-src 'self' https://www.youtube.com https://youtube.com; " +
+                                "img-src 'self' https://image.tmdb.org https://imglink.cc https://www.youtube.com data:;")
+                )
+        );
+
         super.configure(http);
         setLoginView(http, LoginView.class, "/user");
 
-        // Send users to role-specific pages after a successful login.
         http.formLogin(form -> form.successHandler((request, response, authentication) -> {
             boolean isAdmin = authentication.getAuthorities().stream()
                     .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));

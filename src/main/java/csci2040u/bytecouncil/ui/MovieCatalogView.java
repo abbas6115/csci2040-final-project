@@ -1,10 +1,16 @@
 package csci2040u.bytecouncil.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -12,6 +18,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.spring.security.AuthenticationContext;
+
 import csci2040u.bytecouncil.backend.CustomUser;
 import csci2040u.bytecouncil.backend.Movie;
 import csci2040u.bytecouncil.backend.MovieCsvWriter;
@@ -19,10 +26,6 @@ import csci2040u.bytecouncil.ui.movieviewcomp.Header;
 import csci2040u.bytecouncil.ui.movieviewcomp.MovieCard;
 import csci2040u.bytecouncil.ui.movieviewcomp.MovieDetailsLayout;
 import csci2040u.bytecouncil.ui.movieviewcomp.WatchHistorySidebar;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 //Anonymous allowed tells springboot you don't need to login to access this page
 //route("") tells its default page, we can change this later
@@ -174,10 +177,7 @@ public class MovieCatalogView extends VerticalLayout {
         for (int i = start; i < end; i++) {
             Movie movie = filteredMovies.get(i);
             MovieCard movieCard = new MovieCard(movie);
-            movieCard.addClickListener(event -> {
-                openMovieDetails(movie);
-                addMovieToHistory(movie, authCont);
-            });
+            movieCard.addClickListener(event -> openMovieDetails(movie));
             // Insert before the sentinel
             catalogGrid.addComponentAtIndex(catalogGrid.getComponentCount() - 1, movieCard);
         }
@@ -209,18 +209,49 @@ public class MovieCatalogView extends VerticalLayout {
         detailDialog.setCloseOnOutsideClick(true);
         detailDialog.setCloseOnEsc(true);
         detailDialog.getElement().getStyle().set("--lumo-base-color", UIColors.SECONDARYCOLOR);
-        detailDialog.add(new MovieDetailsLayout(movie));
+
+        Button addToWatchHistoryButton = new Button("Add to Watch History", event -> {
+            boolean added = addMovieToHistory(movie);
+            if (added) {
+                Notification.show("Added to watch history", 1800, Notification.Position.BOTTOM_END);
+            }
+        });
+        UIColors.setSecondary(addToWatchHistoryButton);
+        addToWatchHistoryButton.getStyle().set("color", UIColors.TEXTCOLORHEADER);
+        addToWatchHistoryButton.getStyle().set("margin-top", "8px");
+
+        detailDialog.add(new MovieDetailsLayout(movie, addToWatchHistoryButton));
         detailDialog.setWidth("80%"); detailDialog.setHeight("80%");
         detailDialog.open();
     }
 
-    private void addMovieToHistory(Movie movie, AuthenticationContext authCont) {
-        if(authCont.isAuthenticated()){
-            var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null && auth.getPrincipal() instanceof CustomUser currentUser) {
-                currentUser.addToWatchlist(movie);
+    private static boolean addMovieToHistory(Movie movie) {
+        var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof CustomUser currentUser) {
+            boolean alreadyInHistory = currentUser.getRecentlyWatched().stream()
+                    .anyMatch(existingMovie -> isSameMovie(existingMovie, movie));
+            if (alreadyInHistory) {
+                return false;
             }
+            currentUser.addToWatchlist(movie);
+            return true;
         }
+
+        return false;
+    }
+
+    private static boolean isSameMovie(Movie first, Movie second) {
+        if (first == null || second == null) {
+            return false;
+        }
+
+        return Objects.equals(normalize(first.getName()), normalize(second.getName()))
+                && first.getReleaseYear() == second.getReleaseYear()
+                && Objects.equals(normalize(first.getGenre()), normalize(second.getGenre()));
+    }
+
+    private static String normalize(String value) {
+        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
     }
 
     private boolean matchesAllFilters(
