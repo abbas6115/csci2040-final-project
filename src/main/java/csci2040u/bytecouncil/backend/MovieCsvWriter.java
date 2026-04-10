@@ -131,7 +131,8 @@ public class MovieCsvWriter {
                 escape(movie.getActors()),
                 escape(movie.getGenre()),
                 escape(movie.getRatings()),
-                escape(Integer.toString(movie.getReleaseYear()))
+                escape(Integer.toString(movie.getReleaseYear())),
+                escape(movie.getTmdbID())
         );
     }
 
