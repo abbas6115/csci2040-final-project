@@ -79,12 +79,10 @@ public class MovieDetailsLayout extends VerticalLayout {
         name.getStyle().set("font-weight", "bold");
         name.getStyle().set("margin", "0");
 
-        HorizontalLayout nameRow = new HorizontalLayout(name, addToWatchHistoryButton);
+        HorizontalLayout nameRow = new HorizontalLayout(name);
         nameRow.setWidthFull();
         nameRow.setAlignItems(Alignment.CENTER);
         nameRow.setJustifyContentMode(JustifyContentMode.BETWEEN);
-
-        nameRow.add(name, addToWatchHistoryButton);
 
         Span genre = new Span("Genre: " + movie.getGenre());
         Span actors = new Span("Actors: " + movie.getActors());
@@ -115,7 +113,7 @@ public class MovieDetailsLayout extends VerticalLayout {
             }));
         });
 
-        bottomSection.add(detailsBox, logoGrid);
+        bottomSection.add(detailsBox, logoGrid,addToWatchHistoryButton);
 
         // Assemble Final Layout
         add(topSection, bottomSection);
