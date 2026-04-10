@@ -1,5 +1,6 @@
 .idea/
 target/
 OLDJFRAME
+.env
 *.iml
 /src/main/frontend/styles/
