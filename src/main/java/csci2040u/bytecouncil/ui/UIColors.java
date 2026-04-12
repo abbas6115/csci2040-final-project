@@ -2,6 +2,8 @@ package csci2040u.bytecouncil.ui;
 
 import com.vaadin.flow.component.Component;
 
+//holds the ui color palette
+
 public class UIColors {
     //used for background
     public static String DARKMODEBACKGROUND ="#1d1e26";

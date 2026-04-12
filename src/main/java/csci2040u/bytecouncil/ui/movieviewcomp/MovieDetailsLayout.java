@@ -5,8 +5,8 @@ import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-import com.vaadin.flow.component.page.Push;
 import csci2040u.bytecouncil.backend.Movie;
+import csci2040u.bytecouncil.backend.TMBDRequest;
 import csci2040u.bytecouncil.ui.UIColors;
 
 
@@ -22,19 +22,19 @@ public class MovieDetailsLayout extends VerticalLayout {
         TMBDRequest tmdb = new TMBDRequest();
         String movieId = String.valueOf(movie.getTmdbID());
 
-//        movie immage
+        // Movie Image
         HorizontalLayout topSection = new HorizontalLayout();
         topSection.setWidthFull();
         topSection.setAlignItems(Alignment.START);
 
-        // 1. Movie Poster
+        // Movie Poster
         Image poster = new Image(movie.getPosterURL(), "Poster");
         poster.setHeight("280px");
         poster.setWidth("187px");
         poster.getStyle().set("border-radius", "4px");
         poster.getStyle().set("flex-shrink", "0");
 
-        // 2. Video Carousel (Top Right)
+        // Video Carousel
         Div videoCarousel = new Div();
         videoCarousel.setWidthFull();
         videoCarousel.setHeight("280px");
@@ -68,7 +68,7 @@ public class MovieDetailsLayout extends VerticalLayout {
         bottomSection.getStyle().set("border-radius", "8px");
         bottomSection.setPadding(true);
 
-        // Details Box (Title, Genre, Actors, etc.)
+        // Details Box (Title, Genre, Actors)
         VerticalLayout detailsBox = new VerticalLayout();
         detailsBox.setSpacing(false);
         detailsBox.setPadding(false);
@@ -94,7 +94,7 @@ public class MovieDetailsLayout extends VerticalLayout {
             if(c instanceof Span) c.getStyle().set("color", UIColors.TEXTCOLORHEADER).set("font-size", "0.9em");
         });
 
-        // Logos Grid (Bottom Right)
+        // Logos Grid
         Div logoGrid = new Div();
         logoGrid.getStyle().set("display", "grid");
         logoGrid.getStyle().set("grid-template-columns", "repeat(3, 1fr)");
