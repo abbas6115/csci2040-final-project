@@ -2,6 +2,7 @@ package csci2040u.bytecouncil.backend;
 
 import java.util.Collection;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.vaadin.crudui.crud.CrudListener;
@@ -13,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MovieDatabaseCommands implements CrudListener<Movie> {
     //if this is red underlined, go to settings and turn on annotated processing in File->settings->build,Execute->compiler, and download the Lombok plugin in settings->plugins
-    private final MovieRepository movieRepo;
+    private final JpaRepository<Movie, Long> movieRepo;
     private final MovieCsvWriter movieCsvWriter;
 
 
