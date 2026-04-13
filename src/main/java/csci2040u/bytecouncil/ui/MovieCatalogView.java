@@ -22,6 +22,7 @@ import com.vaadin.flow.spring.security.AuthenticationContext;
 import csci2040u.bytecouncil.backend.CustomUser;
 import csci2040u.bytecouncil.backend.Movie;
 import csci2040u.bytecouncil.backend.MovieCsvWriter;
+import csci2040u.bytecouncil.backend.TMBDRequest;
 import csci2040u.bytecouncil.ui.movieviewcomp.Header;
 import csci2040u.bytecouncil.ui.movieviewcomp.MovieCard;
 import csci2040u.bytecouncil.ui.movieviewcomp.MovieDetailsLayout;
@@ -34,6 +35,7 @@ import csci2040u.bytecouncil.ui.movieviewcomp.WatchHistorySidebar;
 @AnonymousAllowed
 public class MovieCatalogView extends VerticalLayout {
     private final AuthenticationContext authCont;
+    private TMBDRequest tmbdRequest;
     private final Div catalogGrid;
     private final Span sentinel;
 
@@ -42,8 +44,9 @@ public class MovieCatalogView extends VerticalLayout {
     private final int PAGE_SIZE = 20;
     private List<Movie> filteredMovies = new ArrayList<>();
 
-    public MovieCatalogView(MovieCsvWriter movieCsvWriter, AuthenticationContext authenticationContext) {
+    public MovieCatalogView(MovieCsvWriter movieCsvWriter, AuthenticationContext authenticationContext, TMBDRequest tmbdRequest) {
         this.authCont = authenticationContext;
+        this.tmbdRequest =tmbdRequest;
 
         // Layout Setup
         this.getStyle().set("min-height", "100vh");
@@ -177,7 +180,7 @@ public class MovieCatalogView extends VerticalLayout {
         for (int i = start; i < end; i++) {
             Movie movie = filteredMovies.get(i);
             MovieCard movieCard = new MovieCard(movie);
-            movieCard.addClickListener(event -> openMovieDetails(movie));
+            movieCard.addClickListener(event -> openMovieDetails(movie,tmbdRequest));
             // Insert before the sentinel
             catalogGrid.addComponentAtIndex(catalogGrid.getComponentCount() - 1, movieCard);
         }
@@ -186,7 +189,7 @@ public class MovieCatalogView extends VerticalLayout {
 
     private void sidebarInit() {
         // 1. Initialize the sidebar
-        WatchHistorySidebar historySidebar = new WatchHistorySidebar();
+        WatchHistorySidebar historySidebar = new WatchHistorySidebar(tmbdRequest);
         Button historyBtn = new Button("Watch History", e -> historySidebar.toggle());
         historyBtn.getStyle().set("position", "fixed").set("left", "0").set("top", "10%").set("z-index", "999");
         UIColors.setSecondary(historyBtn);
@@ -194,7 +197,7 @@ public class MovieCatalogView extends VerticalLayout {
         add(historySidebar.getBackdrop(), historySidebar, historyBtn);
     }
 
-    public static void openMovieDetails(Movie movie) {
+    public static void openMovieDetails(Movie movie, TMBDRequest tmbdRequest) {
 
         Dialog detailDialog = new Dialog();
 
@@ -220,7 +223,7 @@ public class MovieCatalogView extends VerticalLayout {
         addToWatchHistoryButton.getStyle().set("color", UIColors.TEXTCOLORHEADER);
         addToWatchHistoryButton.getStyle().set("margin-top", "8px");
 
-        detailDialog.add(new MovieDetailsLayout(movie, addToWatchHistoryButton));
+        detailDialog.add(new MovieDetailsLayout(movie, addToWatchHistoryButton,tmbdRequest));
         detailDialog.setWidth("80%"); detailDialog.setHeight("80%");
         detailDialog.open();
     }

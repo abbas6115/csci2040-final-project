@@ -11,7 +11,10 @@ import csci2040u.bytecouncil.ui.UIColors;
 
 
 public class MovieDetailsLayout extends VerticalLayout {
-    public MovieDetailsLayout(Movie movie, Button addToWatchHistoryButton){
+    private final TMBDRequest tmdb;
+
+    public MovieDetailsLayout(Movie movie, Button addToWatchHistoryButton,TMBDRequest tmbdRequest){
+        this.tmdb = tmbdRequest;
         this.setWidthFull();
         this.setPadding(true);
         this.setSpacing(true);
@@ -19,7 +22,7 @@ public class MovieDetailsLayout extends VerticalLayout {
 
         this.getStyle().setBackground(UIColors.DARKMODEBACKGROUND);
 
-        TMBDRequest tmdb = new TMBDRequest();
+
         String movieId = String.valueOf(movie.getTmdbID());
 
         // Movie Image

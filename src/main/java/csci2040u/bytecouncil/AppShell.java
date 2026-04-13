@@ -11,7 +11,5 @@ public class AppShell implements AppShellConfigurator {
 
     @Override
     public void configurePage(AppShellSettings settings) {
-        // Correct method is addFavicon (lowercase 'i')
-//        settings.addFavicon("icon", "icons/icon.png");
     }
 }

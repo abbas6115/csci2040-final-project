@@ -2,6 +2,7 @@ package csci2040u.bytecouncil.ui.movieviewcomp;
 
 import java.util.Queue;
 
+import csci2040u.bytecouncil.backend.TMBDRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.vaadin.flow.component.button.Button;
@@ -16,7 +17,9 @@ import csci2040u.bytecouncil.ui.UIColors;
 
 public class WatchHistorySidebar extends VerticalLayout {
     private final VerticalLayout backdrop = new VerticalLayout();
-    public WatchHistorySidebar() {
+    private final TMBDRequest tmbdRequest;
+    public WatchHistorySidebar(TMBDRequest tmbdRequest) {
+        this.tmbdRequest=tmbdRequest;
         // Position and Size
         this.setWidth("350px");
         this.setHeightFull();
@@ -121,7 +124,7 @@ public class WatchHistorySidebar extends VerticalLayout {
                     // Add click listener to close sidebar when a movie is selected
                     card.addClickListener(e -> {
                         this.close();
-                        MovieCatalogView.openMovieDetails(movie);
+                        MovieCatalogView.openMovieDetails(movie,tmbdRequest);
                     });
 
                     this.add(card);

@@ -11,15 +11,18 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /*
 Wrapper Class for requesting trailers, and streaming services
  */
 
+@Service
 public class TMBDRequest {
     private final HttpClient client;
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
-    private final String apiKey="fd51fcbdf9ac457fcea35d70bf437a1b";
+    @Value("${api.key}")
+    private String apiKey;
 
     public TMBDRequest() {
 
