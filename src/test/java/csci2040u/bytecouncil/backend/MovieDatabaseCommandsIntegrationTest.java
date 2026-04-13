@@ -1,13 +1,25 @@
 package csci2040u.bytecouncil.backend;
 
-import org.junit.jupiter.api.*;
-
 import java.io.IOException;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class MovieDatabaseCommandsIntegrationTest {
 
@@ -94,5 +106,37 @@ class MovieDatabaseCommandsIntegrationTest {
         verify(repo, times(1)).saveAll(anyCollection());
 
         assertEquals(2, result.size());
+    }
+
+    @Test
+    void deleteByMovieObjectWhenIdIsNull() {
+        MovieRepository movieRepository = mock(MovieRepository.class);
+        MovieCsvWriter movieCsvWriter = mock(MovieCsvWriter.class);
+        MovieDatabaseCommands commands = new MovieDatabaseCommands(movieRepository, movieCsvWriter);
+
+        Movie movieWithoutId = new Movie("Arrival", "poster", "Amy Adams", "Sci-Fi", "8.0", 2016);
+        // id is null — never assigned
+
+        when(movieRepository.findAll()).thenReturn(List.of());
+
+        commands.delete(movieWithoutId);
+
+        verify(movieRepository).delete(movieWithoutId);
+        verify(movieRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void findAllReturnsEmptyWhenBothDatabaseAndCsvAreEmpty() {
+        MovieRepository movieRepository = mock(MovieRepository.class);
+        MovieCsvWriter movieCsvWriter = mock(MovieCsvWriter.class);
+        MovieDatabaseCommands commands = new MovieDatabaseCommands(movieRepository, movieCsvWriter);
+
+        when(movieRepository.findAll()).thenReturn(List.of());
+        when(movieCsvWriter.readMovies()).thenReturn(List.of());
+
+        Collection<Movie> result = commands.findAll();
+
+        assertTrue(result.isEmpty());
+        verify(movieRepository, never()).saveAll(any());
     }
 }
