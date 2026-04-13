@@ -122,7 +122,7 @@ public class MovieCatalogView extends VerticalLayout {
                     minRatingFilter[0] = parseRating(header.getMinRating());
                     maxRatingFilter[0] = parseRating(header.getMaxRating());
                     minYearFilter[0] = parseYear(header.getMinYear());
-                    maxYearFilter[0] = parseYear(header.getMinYear());
+                    maxYearFilter[0] = parseYear(header.getMaxYear());
 
                     applyFilters.run();
                 });
