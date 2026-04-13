@@ -1,107 +1,118 @@
 package csci2040u.bytecouncil.backend;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
+import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 class MovieDatabaseCommandsTest {
+
+    @Autowired
+    private MovieRepository movieRepository;
+
+    private Path tempCsvPath;
+    private MovieCsvWriter movieCsvWriter;
+    private MovieDatabaseCommands commands;
+
+    @BeforeEach
+    void setUp() throws IOException {
+        tempCsvPath = Files.createTempFile("movie_db_commands", ".csv");
+        movieCsvWriter = new MovieCsvWriter(tempCsvPath.toString());
+        commands = new MovieDatabaseCommands(movieRepository, movieCsvWriter);
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        Files.deleteIfExists(tempCsvPath);
+    }
 
     @Test
     void findAllReturnsDatabaseMoviesWhenDatabaseIsNotEmpty() {
-        MovieRepository movieRepository = mock(MovieRepository.class);
-        MovieCsvWriter movieCsvWriter = mock(MovieCsvWriter.class);
-        MovieDatabaseCommands commands = new MovieDatabaseCommands(movieRepository, movieCsvWriter);
+        Movie dbMovie = new Movie("Dune", "poster", "Timothee", "Sci-Fi", "8.0", 2021);
+        movieRepository.save(dbMovie);
 
-        List<Movie> databaseMovies = List.of(new Movie("Dune", "poster", "Timothee", "Sci-Fi", "8.0", 2021));
-        when(movieRepository.findAll()).thenReturn(databaseMovies);
+        // Seed CSV with a different movie to prove DB values are preferred.
+        movieCsvWriter.appendMovie(new Movie("Interstellar", "poster2", "Matthew", "Sci-Fi", "8.6", 2014));
 
-        assertSame(databaseMovies, commands.findAll());
-        verify(movieRepository).findAll();
-        verify(movieCsvWriter, never()).readMovies();
+        List<Movie> result = (List<Movie>) commands.findAll();
+
+        assertEquals(1, result.size());
+        assertEquals("Dune", result.get(0).getName());
     }
 
     @Test
     void findAllFallsBackToCsvWhenDatabaseIsEmpty() {
-        MovieRepository movieRepository = mock(MovieRepository.class);
-        MovieCsvWriter movieCsvWriter = mock(MovieCsvWriter.class);
-        MovieDatabaseCommands commands = new MovieDatabaseCommands(movieRepository, movieCsvWriter);
+        movieCsvWriter.appendMovie(new Movie("Interstellar", "poster", "Matthew", "Sci-Fi", "8.6", 2014));
 
-        List<Movie> csvMovies = List.of(new Movie("Interstellar", "poster", "Matthew", "Sci-Fi", "8.6", 2014));
-        List<Movie> persistedMovies = List.of(new Movie("Interstellar", "poster", "Matthew", "Sci-Fi", "8.6", 2014));
-        doReturn(List.of()).doReturn(persistedMovies).when(movieRepository).findAll();
-        when(movieCsvWriter.readMovies()).thenReturn(csvMovies);
+        List<Movie> result = (List<Movie>) commands.findAll();
 
-        assertSame(persistedMovies, commands.findAll());
-        verify(movieRepository, times(2)).findAll();
-        verify(movieRepository).saveAll(csvMovies);
-        verify(movieCsvWriter).readMovies();
+        assertEquals(1, result.size());
+        assertEquals("Interstellar", result.get(0).getName());
+        assertEquals(1, movieRepository.findAll().size(), "CSV movie should be persisted into DB");
     }
 
     @Test
     void addSavesMovieAndAppendsSavedMovieToCsv() {
-        MovieRepository movieRepository = mock(MovieRepository.class);
-        MovieCsvWriter movieCsvWriter = mock(MovieCsvWriter.class);
-        MovieDatabaseCommands commands = new MovieDatabaseCommands(movieRepository, movieCsvWriter);
-
         Movie newMovie = new Movie("Arrival", "poster", "Amy Adams", "Sci-Fi", "8.0", 2016);
-        Movie savedMovie = new Movie("Arrival", "poster", "Amy Adams", "Sci-Fi", "8.0", 2016);
-        savedMovie.setId(7L);
-
-        when(movieRepository.save(newMovie)).thenReturn(savedMovie);
 
         Movie result = commands.add(newMovie);
 
-        assertSame(savedMovie, result);
-        verify(movieRepository).save(newMovie);
-        verify(movieCsvWriter).appendMovie(savedMovie);
+        assertTrue(result.getId() != null, "Saved movie should receive a database id");
+        assertEquals(1, movieRepository.findAll().size());
+
+        List<Movie> csvMovies = movieCsvWriter.readMovies();
+        assertEquals(1, csvMovies.size());
+        assertEquals("Arrival", csvMovies.get(0).getName());
     }
 
     @Test
     void updateSavesMovieAndOverwritesCsvWithDatabaseState() {
-        MovieRepository movieRepository = mock(MovieRepository.class);
-        MovieCsvWriter movieCsvWriter = mock(MovieCsvWriter.class);
-        MovieDatabaseCommands commands = new MovieDatabaseCommands(movieRepository, movieCsvWriter);
+        Movie existing = movieRepository.save(
+            new Movie("Arrival", "poster", "Amy Adams", "Sci-Fi", "8.0", 2016)
+        );
 
-        Movie movieToUpdate = new Movie("Arrival", "poster", "Amy Adams", "Sci-Fi", "8.0", 2016);
-        movieToUpdate.setId(7L);
-        Movie updatedMovie = new Movie("Arrival", "new-poster", "Amy Adams", "Sci-Fi", "8.1", 2016);
-        updatedMovie.setId(7L);
+        existing.setPosterURL("new-poster");
+        existing.setRatings("8.1");
 
-        List<Movie> allMoviesAfterUpdate = List.of(updatedMovie);
-        when(movieRepository.save(movieToUpdate)).thenReturn(updatedMovie);
-        when(movieRepository.findAll()).thenReturn(allMoviesAfterUpdate);
+        Movie result = commands.update(existing);
 
-        Movie result = commands.update(movieToUpdate);
+        assertEquals("new-poster", result.getPosterURL());
+        assertEquals("8.1", result.getRatings());
 
-        assertSame(updatedMovie, result);
-        verify(movieRepository).save(movieToUpdate);
-        verify(movieRepository).findAll();
-        verify(movieCsvWriter).overwriteMovies(allMoviesAfterUpdate);
+        List<Movie> csvMovies = movieCsvWriter.readMovies();
+        assertEquals(1, csvMovies.size());
+        assertEquals("new-poster", csvMovies.get(0).getPosterURL());
+        assertEquals("8.1", csvMovies.get(0).getRatings());
     }
 
     @Test
     void deleteByIdAndOverwritesCsvWithRemainingDatabaseState() {
-        MovieRepository movieRepository = mock(MovieRepository.class);
-        MovieCsvWriter movieCsvWriter = mock(MovieCsvWriter.class);
-        MovieDatabaseCommands commands = new MovieDatabaseCommands(movieRepository, movieCsvWriter);
+        Movie toDelete = movieRepository.save(
+            new Movie("Arrival", "poster", "Amy Adams", "Sci-Fi", "8.0", 2016)
+        );
+        movieRepository.save(new Movie("Dune", "poster", "Timothee", "Sci-Fi", "8.0", 2021));
 
-        Movie movieToDelete = new Movie("Arrival", "poster", "Amy Adams", "Sci-Fi", "8.0", 2016);
-        movieToDelete.setId(7L);
+        commands.delete(toDelete);
 
-        List<Movie> remainingMovies = List.of(new Movie("Dune", "poster", "Timothee", "Sci-Fi", "8.0", 2021));
-        when(movieRepository.findAll()).thenReturn(remainingMovies);
+        List<Movie> remaining = movieRepository.findAll();
+        assertEquals(1, remaining.size());
+        assertEquals("Dune", remaining.get(0).getName());
 
-        commands.delete(movieToDelete);
-
-        verify(movieRepository).deleteById(7L);
-        verify(movieRepository).findAll();
-        verify(movieCsvWriter).overwriteMovies(remainingMovies);
+        List<Movie> csvMovies = movieCsvWriter.readMovies();
+        assertEquals(1, csvMovies.size());
+        assertEquals("Dune", csvMovies.get(0).getName());
+        assertFalse(csvMovies.stream().anyMatch(movie -> "Arrival".equals(movie.getName())));
     }
 }

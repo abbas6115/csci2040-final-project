@@ -228,4 +228,16 @@ public class Header extends HorizontalLayout {
     public String getMaxRating(){
         return maxRating.getValue();
     }
+
+    public TextField getSearchField() {
+        return searchField;
+    }
+
+    public Button getApplyFilter() {
+        return applyFilter;
+    }
+
+    public Button getRemoveFilter() {
+        return removeFilter;
+    }
 }

@@ -7,15 +7,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.vaadin.crudui.crud.CrudListener;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
 //This command creates the movie repository attribute with the required arguments
-@RequiredArgsConstructor
 public class MovieDatabaseCommands implements CrudListener<Movie> {
     //if this is red underlined, go to settings and turn on annotated processing in File->settings->build,Execute->compiler, and download the Lombok plugin in settings->plugins
     private final JpaRepository<Movie, Long> movieRepo;
     private final MovieCsvWriter movieCsvWriter;
+
+    public MovieDatabaseCommands(JpaRepository<Movie, Long> movieRepo, MovieCsvWriter movieCsvWriter) {
+        this.movieRepo = movieRepo;
+        this.movieCsvWriter = movieCsvWriter;
+    }
 
 
 

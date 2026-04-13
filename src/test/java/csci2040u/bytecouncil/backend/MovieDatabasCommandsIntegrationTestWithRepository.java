@@ -1,11 +1,11 @@
 package csci2040u.bytecouncil.backend;
 
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -31,7 +31,22 @@ class MovieDatabasCommandsIntegrationTestWithRepository {
     static class TestApplication {
         @Bean
         MovieCsvWriter movieCsvWriter() {
-            return mock(MovieCsvWriter.class);
+            return new MovieCsvWriter("target/test-movies.csv") {
+                @Override
+                public void appendMovie(Movie movie) {
+                    // no-op for tests
+                }
+
+                @Override
+                public void overwriteMovies(Iterable<Movie> movies) {
+                    // no-op for tests
+                }
+
+                @Override
+                public List<Movie> readMovies() {
+                    return List.of();
+                }
+            };
         }
     }
 

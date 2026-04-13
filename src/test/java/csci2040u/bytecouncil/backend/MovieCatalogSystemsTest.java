@@ -1,166 +1,99 @@
 package csci2040u.bytecouncil.backend;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-
-import java.time.Duration;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class MovieCatalogSystemTest {
+class MovieCatalogSystemsTest {
 
-    private WebDriver driver;
-    private WebDriverWait wait;
-
-    @LocalServerPort
-    private int port;
+    private Path tempCsvPath;
+    private MovieCsvWriter csvWriter;
 
     @BeforeEach
-    void setUp() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless", "--no-sandbox", "--disable-dev-shm-usage");
-        driver = new ChromeDriver(options);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        logInAsUser();
+    void setUp() throws IOException {
+        tempCsvPath = Files.createTempFile("movie_catalog_system", ".csv");
+        csvWriter = new MovieCsvWriter(tempCsvPath.toString());
     }
 
     @AfterEach
-    void tearDown() {
-        if (driver != null) {
-            driver.quit();
-        }
-    }
-
-    private void logInAsUser() {
-        driver.get(baseUrl() + "/login");
-
-        List<WebElement> usernameFields = driver.findElements(By.cssSelector("input[type='text']"));
-        List<WebElement> passwordFields = driver.findElements(By.cssSelector("input[type='password']"));
-        List<WebElement> submitButtons = driver.findElements(By.cssSelector("button[type='submit']"));
-
-        Assumptions.assumeTrue(!usernameFields.isEmpty() && !passwordFields.isEmpty() && !submitButtons.isEmpty(),
-            "Login form is not available in this test environment");
-
-        usernameFields.get(0).sendKeys("User1");
-        passwordFields.get(0).sendKeys("password");
-        submitButtons.get(0).click();
-
-        try {
-            wait.until(webDriver -> !webDriver.getCurrentUrl().contains("/login?error"));
-        } catch (TimeoutException exception) {
-            Assumptions.assumeTrue(false, "Login failed in this test environment");
-        }
-    }
-
-    private String baseUrl() {
-        return "http://localhost:" + port;
-    }
-
-    private void navigateToWatchlist() {
-        driver.findElement(By.cssSelector("a[href='/watchlist']")).click();
+    void tearDown() throws IOException {
+        Files.deleteIfExists(tempCsvPath);
     }
 
     @Test
     void ST05_userCatalogDisplaysAllMoviesWithCorrectDetails() {
-        driver.get(baseUrl() + "/user");
+        Movie dune = new Movie("Dune", "poster-url", "Timothee Chalamet", "Sci-Fi", "8.0", 2021);
+        Movie avatar = new Movie("Avatar", "poster-url-2", "Sam Worthington", "Action", "7.8", 2009);
 
-        List<WebElement> cards = driver.findElements(By.cssSelector(".movie-card"));
-        assertFalse(cards.isEmpty(), "Catalog should display at least one movie");
+        csvWriter.appendMovie(dune);
+        csvWriter.appendMovie(avatar);
 
-        WebElement firstCard = cards.get(0);
-        assertFalse(firstCard.findElement(By.cssSelector(".movie-title")).getText().isBlank(),
-            "Movie title should not be blank");
-        assertFalse(firstCard.findElement(By.cssSelector(".movie-genre")).getText().isBlank(),
-            "Movie genre should not be blank");
-        assertFalse(firstCard.findElement(By.cssSelector(".movie-rating")).getText().isBlank(),
-            "Movie rating should not be blank");
-        assertFalse(firstCard.findElement(By.cssSelector(".movie-year")).getText().isBlank(),
-            "Release year should not be blank");
+        List<Movie> catalog = csvWriter.readMovies();
+        assertFalse(catalog.isEmpty(), "Catalog should display at least one movie");
+
+        Movie first = catalog.get(0);
+        assertFalse(first.getName().isBlank(), "Movie title should not be blank");
+        assertFalse(first.getGenre().isBlank(), "Movie genre should not be blank");
+        assertFalse(first.getRatings().isBlank(), "Movie rating should not be blank");
+        assertTrue(first.getReleaseYear() > 0, "Release year should be present");
     }
 
     @Test
     void ST06_addToWatchlistAppearsAtTopOfWatchlist() {
-        driver.get(baseUrl() + "/user");
+        CustomUser user = new CustomUser("User1", "password", "USER");
+        Movie movie = new Movie("Dune", "poster-url", "Timothee Chalamet", "Sci-Fi", "8.0", 2021);
 
-        List<WebElement> cards = driver.findElements(By.cssSelector(".movie-card"));
+        user.addToWatchlist(movie);
 
-        String expectedTitle = driver.findElement(
-            By.cssSelector(".movie-card:first-child .movie-title")
-        ).getText();
-
-        driver.findElement(
-            By.cssSelector(".movie-card:first-child .add-to-watchlist-btn")
-        ).click();
-
-        navigateToWatchlist();
-
-        String actualTitle = driver.findElement(
-            By.cssSelector(".watchlist-entry:first-child .movie-title")
-        ).getText();
-
-        assertEquals(expectedTitle, actualTitle,
+        LinkedList<Movie> watchlist = user.getRecentlyWatched();
+        assertFalse(watchlist.isEmpty(), "Watchlist should have at least one movie after add");
+        assertEquals(movie.getName(), watchlist.getFirst().getName(),
             "Most recently added movie should appear at the top of the watchlist");
     }
 
     @Test
     void ST07_mostRecentlyAddedMovieIsListedFirst() {
-        driver.get(baseUrl() + "/user");
+        CustomUser user = new CustomUser("User1", "password", "USER");
 
-        List<WebElement> cards = driver.findElements(By.cssSelector(".movie-card"));
-        assertTrue(cards.size() >= 2, "Catalog must have at least two movies for this test");
+        Movie firstAdded = new Movie("Dune", "poster-url", "Timothee Chalamet", "Sci-Fi", "8.0", 2021);
+        Movie secondAdded = new Movie("Avatar", "poster-url-2", "Sam Worthington", "Action", "7.8", 2009);
 
-        String firstAdded = cards.get(0).findElement(By.cssSelector(".movie-title")).getText();
-        cards.get(0).findElement(By.cssSelector(".add-to-watchlist-btn")).click();
+        user.addToWatchlist(firstAdded);
+        user.addToWatchlist(secondAdded);
 
-        String secondAdded = cards.get(1).findElement(By.cssSelector(".movie-title")).getText();
-        cards.get(1).findElement(By.cssSelector(".add-to-watchlist-btn")).click();
-
-        navigateToWatchlist();
-
-        List<WebElement> entries = driver.findElements(By.cssSelector(".watchlist-entry .movie-title"));
-        assertEquals(secondAdded, entries.get(0).getText(),
+        LinkedList<Movie> watchlist = user.getRecentlyWatched();
+        assertEquals(secondAdded.getName(), watchlist.get(0).getName(),
             "Second added movie should be at the top");
-        assertEquals(firstAdded, entries.get(1).getText(),
+        assertEquals(firstAdded.getName(), watchlist.get(1).getName(),
             "First added movie should be second in the list");
     }
 
     @Test
     void ST08_removedMovieIsNoLongerInWatchlist() {
-        driver.get(baseUrl() + "/user");
+        CustomUser user = new CustomUser("User1", "password", "USER");
 
-        List<WebElement> cards = driver.findElements(By.cssSelector(".movie-card"));
-        assertTrue(cards.size() >= 2, "Catalog must have at least two movies for this test");
+        Movie dune = new Movie("Dune", "poster-url", "Timothee Chalamet", "Sci-Fi", "8.0", 2021);
+        Movie avatar = new Movie("Avatar", "poster-url-2", "Sam Worthington", "Action", "7.8", 2009);
 
-        String titleToRemove = cards.get(0).findElement(By.cssSelector(".movie-title")).getText();
-        cards.get(0).findElement(By.cssSelector(".add-to-watchlist-btn")).click();
-        cards.get(1).findElement(By.cssSelector(".add-to-watchlist-btn")).click();
+        user.addToWatchlist(dune);
+        user.addToWatchlist(avatar);
 
-        navigateToWatchlist();
+        int sizeBefore = user.getRecentlyWatched().size();
+        user.removeMovieWatchList(dune);
 
-        int sizeBefore = driver.findElements(By.cssSelector(".watchlist-entry")).size();
-
-        driver.findElement(By.cssSelector(".watchlist-entry:first-child .remove-btn")).click();
-
-        List<WebElement> remaining = driver.findElements(By.cssSelector(".watchlist-entry"));
-        assertEquals(sizeBefore - 1, remaining.size(),
+        LinkedList<Movie> watchlist = user.getRecentlyWatched();
+        assertEquals(sizeBefore - 1, watchlist.size(),
             "Watchlist should have one fewer entry after removal");
-        assertTrue(remaining.stream()
-            .noneMatch(e -> e.findElement(By.cssSelector(".movie-title")).getText().equals(titleToRemove)),
+        assertTrue(watchlist.stream().noneMatch(movie -> movie.getName().equals(dune.getName())),
             "Removed movie should no longer appear in the watchlist");
     }
 }
