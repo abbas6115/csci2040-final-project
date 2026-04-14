@@ -16,7 +16,7 @@
 
 ---
 
-Filmbase integrates with TMDB's (The Movie Database) API to retrieve additional movie data such as:
+Filmbase integrates with [TMDB's (The Movie Database) API](https://developer.themoviedb.org/reference/getting-started) to retrieve additional movie data such as:
 
 - Trailers
 - Streaming availability

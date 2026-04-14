@@ -21,7 +21,6 @@ Majority of the project is structured automatically by IntelliJ specifically for
 ```
 csci2040-final-project/
 ├──docs/
-│   ├──assets/
 │   ├──dev/
 │   └──user/
 ├──images/
