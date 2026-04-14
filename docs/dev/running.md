@@ -1,4 +1,4 @@
-# Running the Application
+# ▶️ Running the Application
 
 ---
 

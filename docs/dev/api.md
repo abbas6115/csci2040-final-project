@@ -1,4 +1,4 @@
-# External API Integration (TMDB)
+# 🔌 External API Integration (TMDB)
 
 ---
 
