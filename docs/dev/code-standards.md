@@ -12,7 +12,7 @@
 - [▶️ Running the Application](running.md)
 - **[📘 Code Standards and Conventions](code-standards.md)**
 - [🧪 Testing](testing.md)
-- [🔌 API Information](api.md)
+- [🔌 External API Integration](api.md)
 
 ---
 
