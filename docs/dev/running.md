@@ -36,3 +36,7 @@ In your browser, go to the URL `http://localhost:8080` to access the website. Yo
 - User:
     - User1
     - password
+
+#### Stopping the app
+
+To stop the application and close the webserver, simply go to the terminal where Filmbase is running and press `Ctrl + C`.
